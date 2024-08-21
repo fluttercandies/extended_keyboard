@@ -28,6 +28,7 @@ class KeyboardBuilder extends StatefulWidget {
     required this.body,
     required this.builder,
     this.safeAreaBottom = true,
+    this.resizeToAvoidBottomInset = true,
   }) : super(key: key);
 
   /// A builder function that returns a widget based on the keyboard height.
@@ -38,6 +39,17 @@ class KeyboardBuilder extends StatefulWidget {
 
   /// Whether to add a bottom padding to avoid overlapping with system's safe area.
   final bool safeAreaBottom;
+
+  /// If true the [body] and the scaffold's floating widgets should size
+  /// themselves to avoid the onscreen keyboard whose height is defined by the
+  /// ambient [MediaQuery]'s [MediaQueryData.viewInsets] `bottom` property.
+  ///
+  /// For example, if there is an onscreen keyboard displayed above the
+  /// scaffold, the body can be resized to avoid overlapping the keyboard, which
+  /// prevents widgets inside the body from being obscured by the keyboard.
+  ///
+  /// Defaults to true.
+  final bool resizeToAvoidBottomInset;
 
   @override
   State<KeyboardBuilder> createState() => _KeyboardBuilderState();
@@ -113,79 +125,146 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
     _doJob?.call();
   }
 
+  bool get resizeToAvoidBottomInset => widget.resizeToAvoidBottomInset;
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Expanded(
-          child: widget.body,
-        ),
-        ValueListenableBuilder<KeyboardType>(
-          valueListenable: _controller,
-          builder: (BuildContext context, KeyboardType value, Widget? child) {
-            final double keyboardHeight =
-                MediaQuery.of(context).viewInsets.bottom;
+    if (widget.resizeToAvoidBottomInset) {
+      return Column(
+        children: <Widget>[
+          Expanded(
+            child: widget.body,
+          ),
+          ValueListenableBuilder<KeyboardType>(
+            valueListenable: _controller,
+            builder: (BuildContext context, KeyboardType value, Widget? child) {
+              final double keyboardHeight =
+                  MediaQuery.of(context).viewInsets.bottom;
 
-            _viewPaddingBottom = max(
-              max(
-                MediaQuery.of(context).viewPadding.bottom,
-                _viewPaddingBottom,
-              ),
-              MediaQuery.of(context).padding.bottom,
-            );
+              _viewPaddingBottom = max(
+                max(
+                  MediaQuery.of(context).viewPadding.bottom,
+                  _viewPaddingBottom,
+                ),
+                MediaQuery.of(context).padding.bottom,
+              );
 
-            _preKeyboardHeight = keyboardHeight;
+              _preKeyboardHeight = keyboardHeight;
 
-            switch (value) {
-              case KeyboardType.system:
-                return Container(
-                  height: keyboardHeight +
-                      (widget.safeAreaBottom
-                          ? MediaQuery.of(context).padding.bottom
-                          : 0),
-                );
+              switch (value) {
+                case KeyboardType.system:
+                  return Container(
+                    height: keyboardHeight +
+                        (widget.safeAreaBottom
+                            ? MediaQuery.of(context).padding.bottom
+                            : 0),
+                  );
 
-              case KeyboardType._customToSystem:
-                final double height = _keyboardHeights.isEmpty
-                    ? SystemKeyboard().keyboardHeight ?? keyboardHeight
-                    : _keyboardHeights.first.height;
+                case KeyboardType._customToSystem:
+                  final double height = _keyboardHeights.isEmpty
+                      ? SystemKeyboard().keyboardHeight ?? keyboardHeight
+                      : _keyboardHeights.first.height;
 
-                return Container(height: max(height, keyboardHeight));
+                  return Container(height: max(height, keyboardHeight));
 
-              case KeyboardType.custom:
-                double? height = _keyboardHeights.isEmpty
-                    ? SystemKeyboard().keyboardHeight
-                    : _keyboardHeights
-                        .firstWhere((_KeyboardHeight element) => element.active)
-                        .height;
-
-                if (widget.safeAreaBottom) {
-                  if (height != null) {
-                    height -= _viewPaddingBottom;
+                case KeyboardType.custom:
+                  double? height = _keyboardHeights.isEmpty
+                      ? SystemKeyboard().keyboardHeight
+                      : _keyboardHeights
+                          .firstWhere(
+                              (_KeyboardHeight element) => element.active)
+                          .height;
+                  double viewPaddingBottom = 0;
+                  if (widget.safeAreaBottom) {
+                    if (height != null) {
+                      height -= _viewPaddingBottom;
+                    }
+                    viewPaddingBottom = _viewPaddingBottom;
                   }
+
                   return Padding(
-                    padding: EdgeInsets.only(bottom: _viewPaddingBottom),
+                    padding: EdgeInsets.only(bottom: viewPaddingBottom),
                     child: widget.builder(
                       context,
                       height,
                     ),
                   );
+
+                default:
+                  return Container(
+                    height: 0,
+                  );
+              }
+            },
+          ),
+        ],
+      );
+    } else {
+      return Stack(
+        children: <Widget>[
+          Positioned.fill(
+            child: SafeArea(
+              bottom: widget.safeAreaBottom,
+              maintainBottomViewPadding: true,
+              child: widget.body,
+            ),
+          ),
+          Positioned.fill(
+            child: ValueListenableBuilder<KeyboardType>(
+              valueListenable: _controller,
+              builder:
+                  (BuildContext context, KeyboardType value, Widget? child) {
+                final double keyboardHeight =
+                    MediaQuery.of(context).viewInsets.bottom;
+                _viewPaddingBottom = max(
+                  max(
+                    MediaQuery.of(context).viewPadding.bottom,
+                    _viewPaddingBottom,
+                  ),
+                  MediaQuery.of(context).padding.bottom,
+                );
+
+                _preKeyboardHeight = keyboardHeight;
+
+                switch (value) {
+                  case KeyboardType.custom:
+                    double? height = _keyboardHeights.isEmpty
+                        ? SystemKeyboard().keyboardHeight
+                        : _keyboardHeights
+                            .firstWhere(
+                                (_KeyboardHeight element) => element.active)
+                            .height;
+
+                    double viewPaddingBottom = 0;
+                    if (widget.safeAreaBottom) {
+                      if (height != null) {
+                        height -= _viewPaddingBottom;
+                      }
+                      viewPaddingBottom = _viewPaddingBottom;
+                    }
+
+                    return Column(
+                      children: <Widget>[
+                        const Spacer(),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: viewPaddingBottom),
+                          child: widget.builder(
+                            context,
+                            height,
+                          ),
+                        ),
+                      ],
+                    );
+
+                  default:
+                    return Container();
                 }
-
-                return widget.builder(
-                  context,
-                  height,
-                );
-
-              default:
-                return Container(
-                  height: 0,
-                );
-            }
-          },
-        ),
-      ],
-    );
+              },
+            ),
+          ),
+        ],
+      );
+    }
   }
 }
 

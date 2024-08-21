@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart' hide Element;
 import 'package:html/dom.dart' hide Text;
@@ -24,12 +25,6 @@ class ImageText extends SpecialText {
     ///content already has endflag '/'
     final String text = toString();
 
-    ///'<img src='$url'/>'
-//    var index1 = text.indexOf(''') + 1;
-//    var index2 = text.indexOf(''', index1);
-//
-//    var url = text.substring(index1, index2);
-//
     ////'<img src='$url' width='${item.imageSize.width}' height='${item.imageSize.height}'/>'
     final Document html = parse(text);
 
@@ -37,8 +32,8 @@ class ImageText extends SpecialText {
     final String url = img.attributes['src']!;
     _imageUrl = url;
 
-    //fontsize id define image height
-    //size = 30.0/26.0 * fontSize
+    // fontsize id define image height
+    // size = 30.0/26.0 * fontSize
     double? width = 60.0;
     double? height = 60.0;
     const BoxFit fit = BoxFit.cover;
@@ -65,21 +60,20 @@ class ImageText extends SpecialText {
       }
     }
 
-    ///fontSize 26 and text height =30.0
-    //final double fontSize = 26.0;
-
     return ExtendedWidgetSpan(
-        start: start!,
-        actualText: text,
-        child: GestureDetector(
-            onTap: () {
-              onTap?.call(url);
-            },
-            child: Image.network(
-              url,
-              width: width,
-              height: height,
-              fit: fit,
-            )));
+      start: start!,
+      actualText: text,
+      child: GestureDetector(
+        onTap: () {
+          onTap?.call(url);
+        },
+        child: ExtendedImage.network(
+          url,
+          width: width,
+          height: height,
+          fit: fit,
+        ),
+      ),
+    );
   }
 }

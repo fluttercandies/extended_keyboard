@@ -56,6 +56,7 @@ class KeyboardDismisser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Listener(
+      behavior: HitTestBehavior.translucent,
       onPointerDown: (PointerDownEvent d) {
         // Dismiss the keyboard when touching outside of the input field.
         final FocusScopeNode currentFocus = FocusScope.of(context);
@@ -64,10 +65,11 @@ class KeyboardDismisser extends StatelessWidget {
         if (!currentFocus.hasPrimaryFocus && focusedChild != null) {
           // Close the keyboard when the tapped area is not an input field.
           // It's also possible that the tapped area is another input field.
-          if (!focusedChild.rect.contains(d.localPosition)) {
+          final Offset position = d.original?.position ?? d.localPosition;
+          if (!focusedChild.rect.contains(position)) {
             // Check if the tapped area is an input field.
             final HitTestResult result = HitTestResult();
-            WidgetsBinding.instance.hitTest(result, d.localPosition);
+            WidgetsBinding.instance.hitTest(result, position);
 
             for (final HitTestEntry<HitTestTarget> element in result.path) {
               final HitTestTarget target = element.target;

@@ -42,73 +42,91 @@ class _ChatDemoState extends State<ChatDemo> {
   late TuChongRepository imageList = TuChongRepository(maxLength: 100);
   @override
   Widget build(BuildContext context) {
-    return KeyboardBuilder(
-      safeAreaBottom: true,
-      builder: (BuildContext context, double? keyboardHeight) {
-        return _buildCustomKeyboard(context, keyboardHeight);
-      },
-      body: Column(children: <Widget>[
-        const Spacer(),
-        Row(
-          children: <Widget>[
-            const SizedBox(width: 10),
-            Expanded(
-              child: ExtendedTextField(
-                key: _key,
-                specialTextSpanBuilder: _mySpecialTextSpanBuilder,
-                controller: _textEditingController,
-                decoration: const InputDecoration(
-                  hintText: 'Input something',
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: const Text('ChatDemo')),
+      body: KeyboardBuilder(
+        safeAreaBottom: true,
+        builder: (BuildContext context, double? keyboardHeight) {
+          return _buildCustomKeyboard(context, keyboardHeight);
+        },
+        body: Column(children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('item $index'),
+                );
+              },
+              itemCount: 200,
+            ),
+          ),
+          const TextField(
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+          ),
+          Row(
+            children: <Widget>[
+              const SizedBox(width: 10),
+              Expanded(
+                child: ExtendedTextField(
+                  key: _key,
+                  specialTextSpanBuilder: _mySpecialTextSpanBuilder,
+                  controller: _textEditingController,
+                  decoration: const InputDecoration(
+                    hintText: 'Input something',
+                  ),
+                  strutStyle: const StrutStyle(),
                 ),
-                strutStyle: const StrutStyle(),
               ),
-            ),
-            KeyboardTypeBuilder(
-              builder: (
-                BuildContext context,
-                KeyboardTypeController controller,
-              ) =>
-                  Row(
-                children: <Widget>[
-                  ToggleButton(
-                    builder: (bool active) => Icon(
-                      Icons.sentiment_very_satisfied,
-                      color: active ? Colors.orange : null,
+              KeyboardTypeBuilder(
+                builder: (
+                  BuildContext context,
+                  CustomKeyboardController controller,
+                ) =>
+                    Row(
+                  children: <Widget>[
+                    ToggleButton(
+                      builder: (bool active) => Icon(
+                        Icons.sentiment_very_satisfied,
+                        color: active ? Colors.orange : null,
+                      ),
+                      activeChanged: (bool active) {
+                        _keyboardPanelType = KeyboardPanelType.emoji;
+                        if (active) {
+                          controller.showKeyboard();
+                        } else {
+                          controller.hideKeyboard();
+                        }
+                      },
+                      active: controller.isCustom &&
+                          _keyboardPanelType == KeyboardPanelType.emoji,
                     ),
-                    activeChanged: (bool active) {
-                      _keyboardPanelType = KeyboardPanelType.emoji;
-                      if (active) {
-                        controller.showKeyboard();
-                      } else {
-                        controller.hideKeyboard();
-                      }
-                    },
-                    active: controller.isCustom &&
-                        _keyboardPanelType == KeyboardPanelType.emoji,
-                  ),
-                  ToggleButton(
-                    builder: (bool active) => Icon(
-                      Icons.image,
-                      color: active ? Colors.orange : null,
+                    ToggleButton(
+                      builder: (bool active) => Icon(
+                        Icons.image,
+                        color: active ? Colors.orange : null,
+                      ),
+                      activeChanged: (bool active) {
+                        _keyboardPanelType = KeyboardPanelType.image;
+                        if (active) {
+                          controller.showKeyboard();
+                        } else {
+                          controller.hideKeyboard();
+                        }
+                      },
+                      active: controller.isCustom &&
+                          _keyboardPanelType == KeyboardPanelType.image,
                     ),
-                    activeChanged: (bool active) {
-                      _keyboardPanelType = KeyboardPanelType.image;
-                      if (active) {
-                        controller.showKeyboard();
-                      } else {
-                        controller.hideKeyboard();
-                      }
-                    },
-                    active: controller.isCustom &&
-                        _keyboardPanelType == KeyboardPanelType.image,
-                  ),
-                  const SizedBox(width: 10),
-                ],
+                    const SizedBox(width: 10),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ]),
+            ],
+          ),
+        ]),
+      ),
     );
   }
 
@@ -117,6 +135,7 @@ class _ChatDemoState extends State<ChatDemo> {
     double? keyboardHeight,
   ) {
     keyboardHeight ??= 300;
+
     switch (_keyboardPanelType) {
       case KeyboardPanelType.emoji:
         return SizedBox(
@@ -176,34 +195,7 @@ class _ChatDemoState extends State<ChatDemo> {
   }
 
   void insertText(String text) {
-    final TextEditingValue value = _textEditingController.value;
-    final int start = value.selection.baseOffset;
-    int end = value.selection.extentOffset;
-    if (value.selection.isValid) {
-      String newText = '';
-      if (value.selection.isCollapsed) {
-        if (end > 0) {
-          newText += value.text.substring(0, end);
-        }
-        newText += text;
-        if (value.text.length > end) {
-          newText += value.text.substring(end, value.text.length);
-        }
-      } else {
-        newText = value.text.replaceRange(start, end, text);
-        end = start;
-      }
-
-      _textEditingController.value = value.copyWith(
-          text: newText,
-          selection: value.selection.copyWith(
-              baseOffset: end + text.length, extentOffset: end + text.length));
-    } else {
-      _textEditingController.value = TextEditingValue(
-          text: text,
-          selection:
-              TextSelection.fromPosition(TextPosition(offset: text.length)));
-    }
+    _textEditingController.insertText(text);
 
     SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
       _key.currentState?.bringIntoView(_textEditingController.selection.base);

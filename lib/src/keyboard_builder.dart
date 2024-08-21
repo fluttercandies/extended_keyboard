@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'system_keyboard.dart';
 import 'utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,11 @@ enum KeyboardType {
   _customToSystem,
 }
 
+typedef KeyboardBuilderCallback = Widget Function(
+  BuildContext context,
+  double? keyboardHeight,
+);
+
 /// A widget that builds a custom keyboard based on the provided builder function.
 class KeyboardBuilder extends StatefulWidget {
   const KeyboardBuilder({
@@ -25,10 +31,7 @@ class KeyboardBuilder extends StatefulWidget {
   }) : super(key: key);
 
   /// A builder function that returns a widget based on the keyboard height.
-  final Widget Function(
-    BuildContext context,
-    double? keyboardHeight,
-  ) builder;
+  final KeyboardBuilderCallback builder;
 
   /// The main body widget that is displayed behind the keyboard.
   final Widget body;
@@ -49,8 +52,8 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
   final List<_KeyboardHeight> _keyboardHeights = <_KeyboardHeight>[];
 
   void Function()? _doJob;
-  final KeyboardTypeController _keyboardType =
-      KeyboardTypeController(KeyboardType.system);
+  final CustomKeyboardController _controller =
+      CustomKeyboardController(KeyboardType.system);
 
   @override
   void initState() {
@@ -71,10 +74,10 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
   }
 
   void _updateKeyboardState() {
-    if (_keyboardType.isCustom &&
+    if (_controller.isCustom &&
         _preKeyboardHeight == 0 &&
         WidgetsBinding.instance.window.viewInsets.bottom != 0) {
-      _keyboardType._updateValue(KeyboardType.system);
+      _controller._updateValue(KeyboardType.system);
     }
     _doJob ??= () {
       if (mounted) {
@@ -83,8 +86,8 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                 WidgetsBinding.instance.window.devicePixelRatio;
 
         if (currentHeight != 0) {
-          if (_keyboardType.value != KeyboardType.system) {
-            _keyboardType._setValue(KeyboardType.system);
+          if (_controller.value != KeyboardType.system) {
+            _controller._setValue(KeyboardType.system);
           }
 
           final _KeyboardHeight height =
@@ -97,13 +100,13 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
           for (final _KeyboardHeight element in _keyboardHeights) {
             element.active = element == height;
           }
-        } else if (_keyboardType.value == KeyboardType.system) {
+        } else if (_controller.value == KeyboardType.system) {
           _keyboardHeights.clear();
         }
       }
     }.debounce(
       const Duration(
-        milliseconds: 200,
+        milliseconds: 100,
       ),
     );
 
@@ -118,7 +121,7 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
           child: widget.body,
         ),
         ValueListenableBuilder<KeyboardType>(
-          valueListenable: _keyboardType,
+          valueListenable: _controller,
           builder: (BuildContext context, KeyboardType value, Widget? child) {
             final double keyboardHeight =
                 MediaQuery.of(context).viewInsets.bottom;
@@ -144,19 +147,14 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
 
               case KeyboardType._customToSystem:
                 final double height = _keyboardHeights.isEmpty
-                    ? keyboardHeight
+                    ? SystemKeyboard().keyboardHeight ?? keyboardHeight
                     : _keyboardHeights.first.height;
 
-                return AnimatedContainer(
-                  height: height,
-                  duration: const Duration(
-                    milliseconds: 200,
-                  ),
-                );
+                return Container(height: max(height, keyboardHeight));
 
               case KeyboardType.custom:
                 double? height = _keyboardHeights.isEmpty
-                    ? null
+                    ? SystemKeyboard().keyboardHeight
                     : _keyboardHeights
                         .firstWhere((_KeyboardHeight element) => element.active)
                         .height;
@@ -214,10 +212,10 @@ class _KeyboardHeight {
 }
 
 /// A controller for managing the keyboard type and notifying listeners.
-class KeyboardTypeController extends ChangeNotifier
+class CustomKeyboardController extends ChangeNotifier
     implements ValueListenable<KeyboardType> {
   /// Creates a [ChangeNotifier] that wraps this value.
-  KeyboardTypeController(this._value);
+  CustomKeyboardController(this._value);
 
   /// The current value stored in this notifier.
   ///
@@ -266,7 +264,7 @@ class KeyboardTypeController extends ChangeNotifier
   String toString() => '${describeIdentity(this)}($value)';
 }
 
-/// A widget that listens to changes in the [KeyboardTypeController] and builds a widget accordingly.
+/// A widget that listens to changes in the [CustomKeyboardController] and builds a widget accordingly.
 class KeyboardTypeBuilder extends StatelessWidget {
   const KeyboardTypeBuilder({
     Key? key,
@@ -274,13 +272,13 @@ class KeyboardTypeBuilder extends StatelessWidget {
   }) : super(key: key);
 
   /// A builder function that returns a widget based on the keyboard type controller.
-  final Widget Function(BuildContext context, KeyboardTypeController notifier)
+  final Widget Function(BuildContext context, CustomKeyboardController notifier)
       builder;
 
   @override
   Widget build(BuildContext context) {
-    final KeyboardTypeController notifier =
-        context.findAncestorStateOfType<_KeyboardBuilderState>()!._keyboardType;
+    final CustomKeyboardController notifier =
+        context.findAncestorStateOfType<_KeyboardBuilderState>()!._controller;
     return ValueListenableBuilder<KeyboardType>(
       valueListenable: notifier,
       builder: (BuildContext context, KeyboardType value, Widget? child) {

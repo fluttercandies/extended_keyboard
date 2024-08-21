@@ -13,6 +13,7 @@ class SystemKeyboard with WidgetsBindingObserver {
   SystemKeyboard._();
   static final SystemKeyboard _systemKeyboard = SystemKeyboard._();
   static final List<double> _keyboardHeights = <double>[];
+  ValueNotifier<double> afterKeyboardLayout = ValueNotifier<double>(0);
   double? _keyboardHeight;
   final void Function() _doJob = () {
     final double currentHeight =
@@ -29,6 +30,7 @@ class SystemKeyboard with WidgetsBindingObserver {
     } else {
       _keyboardHeights.clear();
     }
+    SystemKeyboard().afterKeyboardLayout.value = currentHeight;
   }.debounce(const Duration(milliseconds: 100));
 
   double? get keyboardHeight {

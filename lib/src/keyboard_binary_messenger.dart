@@ -48,7 +48,7 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
     if (channel == SystemChannels.textInput.name) {
       final MethodCall methodCall = codec.decodeMethodCall(message);
 
-      if (kDebugMode) {
+      if (kDebugMode && false) {
         print('xxx ${methodCall.method}');
       }
       switch (methodCall.method) {

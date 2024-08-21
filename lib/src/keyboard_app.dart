@@ -54,44 +54,59 @@ class _KeyboardAppState extends State<KeyboardApp> {
           ),
           MediaQuery.of(context).padding.bottom,
         );
-        final double keyboardHeight = keyboardHandler
+        final double customKeyboardHeight = keyboardHandler
                 ?.getKeyboardHeight(SystemKeyboard().keyboardHeight) ??
             SystemKeyboard().keyboardHeight ??
             widget.keyboardHeight;
         final bool safeAreaBottom =
             keyboardHandler?.safeAreaBottom ?? widget.safeAreaBottom;
         final double bottomPadding = safeAreaBottom ? _viewPaddingBottom : 0.0;
-        final Duration duration = (show
+        Duration duration = (show
                 ? keyboardHandler?.showDuration
                 : keyboardHandler?.hideDuration) ??
             const Duration();
 
-        // double systemKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+        double systemKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+        if (systemKeyboardHeight != 0) {
+          duration = const Duration();
+        }
+
+        print('show: $show------- systemKeyboardHeight: $systemKeyboardHeight');
         return Material(
           child: Stack(
             clipBehavior: Clip.hardEdge,
             children: <Widget>[
-              AnimatedPositioned(
+              Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: (resizeToAvoidBottomInset && show) ? keyboardHeight : 0,
+                bottom: resizeToAvoidBottomInset
+                    ? (show
+                        ? customKeyboardHeight -
+                            MediaQuery.of(context).padding.bottom
+                        : systemKeyboardHeight)
+                    : 0,
+
                 // hanle by SafeArea
                 //+
                 //  bottomPadding,
 
-                duration: duration,
+                //duration: duration,
                 child: child!,
               ),
               AnimatedPositioned(
                 left: 0,
                 right: 0,
-                bottom: show ? bottomPadding : -keyboardHeight,
+                bottom: show ? 0 : -customKeyboardHeight,
                 duration: duration,
                 child: SizedBox(
-                  height: keyboardHeight,
+                  height: customKeyboardHeight,
                   child: show
-                      ? KeyboardBindingMixin.binding.keyboardHandler?.builder()
+                      ? Padding(
+                          padding: EdgeInsets.only(bottom: bottomPadding),
+                          child: KeyboardBindingMixin.binding.keyboardHandler
+                              ?.builder(),
+                        )
                       : null,
                 ),
               )

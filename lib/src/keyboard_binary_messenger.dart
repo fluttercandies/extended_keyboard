@@ -19,7 +19,8 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
   final Map<ModalRoute<Object?>, List<KeyboardConfiguration>> _configurations =
       <ModalRoute<Object?>, List<KeyboardConfiguration>>{};
 
-  ValueNotifier<bool> showKeyboardNotifier = ValueNotifier<bool>(false);
+  KeyboardConfigurationController showKeyboardNotifier =
+      KeyboardConfigurationController();
 
   KeyboardConfiguration? keyboardHandler;
   void register({
@@ -35,9 +36,8 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
 
   MethodCodec get codec => SystemChannels.textInput.codec;
 
-  bool get isShow => showKeyboardNotifier.value;
-
   int? connectionId;
+  String? name;
 
   Future<ByteData?> _handleTextInputMsg(
       String channel, ByteData? message) async {
@@ -47,17 +47,18 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
       switch (methodCall.method) {
         case 'TextInput.show':
           if (keyboardHandler != null) {
-            showKeyboardNotifier.value = true;
+            showKeyboardNotifier.value = keyboardHandler;
             return codec.encodeSuccessEnvelope(null);
           }
           break;
         case 'TextInput.hide':
-          showKeyboardNotifier.value = false;
+          showKeyboardNotifier.value = keyboardHandler;
           break;
         case 'TextInput.clearClient':
           connectionId = null;
+          name = null;
           if (keyboardHandler != null) {
-            showKeyboardNotifier.value = false;
+            showKeyboardNotifier.value = keyboardHandler;
             keyboardHandler = null;
             return null;
           }
@@ -65,8 +66,7 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
           break;
         case 'TextInput.setClient':
           connectionId = methodCall.arguments[0] as int;
-          final String name =
-              methodCall.arguments[1]['inputType']['name'] as String;
+          name = methodCall.arguments[1]['inputType']['name'] as String;
 
           for (final ModalRoute<Object?> route in _configurations.keys) {
             if (route.isCurrent) {
@@ -172,4 +172,30 @@ class KeyboardConfiguration {
   final bool? resizeToAvoidBottomInset;
 
   final ExtendedTextInputType keyboardType;
+}
+
+/// Enum representing different types of keyboards.
+enum KeyboardState {
+  none,
+
+  /// system keyboard
+  system,
+
+  /// custom keyboard
+  custom,
+  _customToSystem,
+  _systemToCustom,
+}
+
+class KeyboardConfigurationController extends ChangeNotifier
+    implements ValueListenable<KeyboardConfiguration?> {
+  KeyboardConfiguration? _keyboardConfiguration;
+  @override
+  KeyboardConfiguration? get value => _keyboardConfiguration;
+  set value(KeyboardConfiguration? value) {
+    if (_keyboardConfiguration != value) {
+      _keyboardConfiguration = value;
+      notifyListeners();
+    }
+  }
 }

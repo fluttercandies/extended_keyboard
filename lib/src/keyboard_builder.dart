@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'keyboard_height.dart';
 import 'system_keyboard.dart';
 import 'utils.dart';
 import 'package:flutter/foundation.dart';
@@ -55,7 +56,7 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
     with WidgetsBindingObserver {
   double _preKeyboardHeight = 0;
 
-  final List<_KeyboardHeight> _keyboardHeights = <_KeyboardHeight>[];
+  final List<KeyboardHeight> _keyboardHeights = <KeyboardHeight>[];
 
   void Function()? _doJob;
   final CustomKeyboardController _controller =
@@ -96,15 +97,15 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
             _controller._setValue(KeyboardType.system);
           }
 
-          final _KeyboardHeight height =
-              _KeyboardHeight(height: currentHeight, active: true);
+          final KeyboardHeight height =
+              KeyboardHeight(height: currentHeight, isActive: true);
 
           if (!_keyboardHeights.contains(height)) {
             _keyboardHeights.add(height);
           }
 
-          for (final _KeyboardHeight element in _keyboardHeights) {
-            element.active = element == height;
+          for (final KeyboardHeight element in _keyboardHeights) {
+            element.isActive = element == height;
           }
         } else if (_controller.value == KeyboardType.system) {
           _keyboardHeights.clear();
@@ -161,7 +162,7 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                       ? SystemKeyboard().keyboardHeight
                       : _keyboardHeights
                           .firstWhere(
-                              (_KeyboardHeight element) => element.active)
+                              (KeyboardHeight element) => element.isActive)
                           .height;
 
                   if (height != null) {
@@ -207,7 +208,7 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                         ? SystemKeyboard().keyboardHeight
                         : _keyboardHeights
                             .firstWhere(
-                                (_KeyboardHeight element) => element.active)
+                                (KeyboardHeight element) => element.isActive)
                             .height;
 
                     if (height != null) {
@@ -234,28 +235,6 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
       );
     }
   }
-}
-
-/// Class representing the height of the keyboard and its active state.
-class _KeyboardHeight {
-  _KeyboardHeight({
-    required this.height,
-    required this.active,
-  });
-  final double height;
-  bool active = false;
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _KeyboardHeight &&
-          runtimeType == other.runtimeType &&
-          height == other.height;
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => height.hashCode;
 }
 
 /// A controller for managing the keyboard type and notifying listeners.

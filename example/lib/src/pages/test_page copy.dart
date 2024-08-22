@@ -35,6 +35,8 @@ class _TestPage1State extends State<TestPage1> {
           return _buildCustomKeyboard(TextInputAction.next, _controller);
         },
         textInputTypeName: '测试',
+        showDuration: const Duration(seconds: 1),
+        hideDuration: const Duration(seconds: 1),
       ),
       KeyboardConfiguration(
         getKeyboardHeight: (double? systemKeyboardHeight) =>

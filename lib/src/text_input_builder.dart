@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:extended_keyboard/extended_keyboard.dart';
+import 'package:extended_keyboard/src/keyboard_height.dart';
 import 'package:flutter/material.dart';
 
 class TextInputBuilder extends StatefulWidget {
@@ -36,10 +37,23 @@ class TextInputBuilder extends StatefulWidget {
 
 class _TextInputBuilderState extends State<TextInputBuilder> {
   ModalRoute<Object?>? _route;
-  double _preKeyboardHeight = 0;
+  double _currentKeyboardHeight = 0;
+  double _preSystemKeyboardHeight = 0;
   @override
   void initState() {
     super.initState();
+    SystemKeyboard()
+        .afterKeyboardLayoutFinshed
+        .addListener(_afterKeyboardLayoutFinshed);
+  }
+
+  void _afterKeyboardLayoutFinshed() {
+    if (_currentKeyboardHeight == 0) {
+      return;
+    }
+    if (_currentKeyboardHeight != systemKeyboardHeight) {
+      setState(() {});
+    }
   }
 
   @override
@@ -66,65 +80,100 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
 
   @override
   void dispose() {
+    SystemKeyboard()
+        .afterKeyboardLayoutFinshed
+        .removeListener(_afterKeyboardLayoutFinshed);
     KeyboardBindingMixin.binding.unregister(route: _route!);
     super.dispose();
   }
 
+  double? get systemKeyboardHeight {
+    if (SystemKeyboard().keyboardHeights.isNotEmpty) {
+      return SystemKeyboard()
+          .keyboardHeights
+          .firstWhere((KeyboardHeight element) => element.isActive)
+          .height;
+    }
+    return SystemKeyboard().keyboardHeight;
+  }
+
+  KeyboardConfiguration? preConfiguration;
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
+    return ValueListenableBuilder<KeyboardConfiguration?>(
       valueListenable: KeyboardBindingMixin.binding.showKeyboardNotifier,
-      builder: (BuildContext context, bool show, Widget? child) {
+      builder: (
+        BuildContext context,
+        KeyboardConfiguration? configuration,
+        Widget? child,
+      ) {
+        final bool show = KeyboardBindingMixin.binding.keyboardHandler != null;
+
         final KeyboardConfiguration? keyboardHandler =
-            KeyboardBindingMixin.binding.keyboardHandler;
+            configuration ?? preConfiguration;
+
+        preConfiguration = configuration;
         final bool resizeToAvoidBottomInset =
             keyboardHandler?.resizeToAvoidBottomInset ??
                 widget.resizeToAvoidBottomInset;
 
-        final double customKeyboardHeight = (keyboardHandler
-                    ?.getKeyboardHeight(SystemKeyboard().keyboardHeight) ??
-                SystemKeyboard().keyboardHeight ??
-                widget.keyboardHeight) -
-            SystemKeyboard.safeBottom;
+        final double customKeyboardHeight =
+            (keyboardHandler?.getKeyboardHeight(systemKeyboardHeight) ??
+                    systemKeyboardHeight ??
+                    widget.keyboardHeight) -
+                SystemKeyboard.safeBottom;
 
         Duration duration = (show
                 ? keyboardHandler?.showDuration
                 : keyboardHandler?.hideDuration) ??
             const Duration();
 
-        final double systemKeyboardHeight =
+        final double currentSystemKeyboardHeight =
             MediaQuery.of(context).viewInsets.bottom;
-        _preKeyboardHeight = systemKeyboardHeight;
-        if (systemKeyboardHeight != 0) {
+
+        if (currentSystemKeyboardHeight != 0) {
           duration = const Duration();
         }
         final double viewPaddingBottom =
             MediaQuery.of(context).viewPadding.bottom;
+
+        _currentKeyboardHeight = currentSystemKeyboardHeight;
+
+        if (currentSystemKeyboardHeight > _preSystemKeyboardHeight) {
+          if (preConfiguration != null) {
+            // custom keyboard to system keyboard
+            // try to find cache keyboard height by input type name
+            _currentKeyboardHeight =
+                SystemKeyboard().getSystemKeyboardHeightByName() ??
+                    customKeyboardHeight + viewPaddingBottom;
+          }
+        } else if (currentSystemKeyboardHeight < _preSystemKeyboardHeight) {
+        } else {}
+        _preSystemKeyboardHeight = currentSystemKeyboardHeight;
+
         return Stack(
           clipBehavior: Clip.hardEdge,
           children: <Widget>[
-            Positioned(
+            AnimatedPositioned(
               top: 0,
               left: 0,
               right: 0,
               bottom: resizeToAvoidBottomInset
                   ? (show
                       ? customKeyboardHeight + viewPaddingBottom
-                      : systemKeyboardHeight)
+                      : _currentKeyboardHeight)
                   : 0,
-              //duration: duration,
+              duration: duration,
               child: child!,
             ),
             AnimatedPositioned(
               left: 0,
               right: 0,
-              bottom: viewPaddingBottom,
+              bottom: show ? viewPaddingBottom : -customKeyboardHeight,
               duration: duration,
               child: SizedBox(
                 height: customKeyboardHeight,
-                child: show
-                    ? KeyboardBindingMixin.binding.keyboardHandler?.builder()
-                    : null,
+                child: keyboardHandler?.builder(),
               ),
             )
           ],

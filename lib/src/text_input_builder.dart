@@ -3,13 +3,13 @@ import 'dart:math';
 import 'package:extended_keyboard/extended_keyboard.dart';
 import 'package:flutter/material.dart';
 
-class KeyboardApp extends StatefulWidget {
-  const KeyboardApp({
+class TextInputBuilder extends StatefulWidget {
+  const TextInputBuilder({
     Key? key,
     this.resizeToAvoidBottomInset = true,
     required this.body,
-    this.safeAreaBottom = true,
     this.keyboardHeight = 200,
+    required this.configurations,
   }) : super(key: key);
 
   /// If true the [body] and the scaffold's floating widgets should size
@@ -25,17 +25,50 @@ class KeyboardApp extends StatefulWidget {
 
   final Widget body;
 
-  /// Whether to add a bottom padding to avoid overlapping with system's safe area.
-  final bool safeAreaBottom;
-
   /// The default height of the keyboard.
   final double keyboardHeight;
 
+  final List<KeyboardConfiguration> configurations;
+
   @override
-  State<KeyboardApp> createState() => _KeyboardAppState();
+  State<TextInputBuilder> createState() => _TextInputBuilderState();
 }
 
-class _KeyboardAppState extends State<KeyboardApp> {
+class _TextInputBuilderState extends State<TextInputBuilder> {
+  ModalRoute<Object?>? _route;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _route = ModalRoute.of(context);
+    KeyboardBindingMixin.binding.register(
+      route: _route!,
+      configurations: widget.configurations,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant TextInputBuilder oldWidget) {
+    if (oldWidget.configurations != widget.configurations) {
+      KeyboardBindingMixin.binding.unregister(route: _route!);
+      KeyboardBindingMixin.binding.register(
+        route: _route!,
+        configurations: widget.configurations,
+      );
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    KeyboardBindingMixin.binding.unregister(route: _route!);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
@@ -50,26 +83,21 @@ class _KeyboardAppState extends State<KeyboardApp> {
         final double customKeyboardHeight = (keyboardHandler
                     ?.getKeyboardHeight(SystemKeyboard().keyboardHeight) ??
                 SystemKeyboard().keyboardHeight ??
-                widget.keyboardHeight)
-            // keybaord height includes the safe bottom padding
-            -
-            SystemKeyboard.safeBottom
-            // view padding bottom animate
-            +
-            MediaQuery.of(context).viewPadding.bottom;
-        final bool safeAreaBottom = widget.safeAreaBottom;
+                widget.keyboardHeight) -
+            SystemKeyboard.safeBottom;
 
         Duration duration = (show
                 ? keyboardHandler?.showDuration
                 : keyboardHandler?.hideDuration) ??
             const Duration();
 
-        double systemKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+        final double systemKeyboardHeight =
+            MediaQuery.of(context).viewInsets.bottom;
         if (systemKeyboardHeight != 0) {
           duration = const Duration();
         }
-
-        print('show: $show------- systemKeyboardHeight: $systemKeyboardHeight');
+        final double viewPaddingBottom =
+            MediaQuery.of(context).viewPadding.bottom;
         return Material(
           child: Stack(
             clipBehavior: Clip.hardEdge,
@@ -79,22 +107,17 @@ class _KeyboardAppState extends State<KeyboardApp> {
                 left: 0,
                 right: 0,
                 bottom: resizeToAvoidBottomInset
-                    ? (show ? customKeyboardHeight : systemKeyboardHeight)
+                    ? (show
+                        ? customKeyboardHeight + viewPaddingBottom
+                        : systemKeyboardHeight)
                     : 0,
-
-                // hanle by SafeArea
-                //+
-                //  bottomPadding,
-
                 //duration: duration,
                 child: child!,
               ),
               AnimatedPositioned(
                 left: 0,
                 right: 0,
-                bottom: show
-                    ? MediaQuery.of(context).viewPadding.bottom
-                    : -customKeyboardHeight,
+                bottom: viewPaddingBottom,
                 duration: duration,
                 child: SizedBox(
                   height: customKeyboardHeight,

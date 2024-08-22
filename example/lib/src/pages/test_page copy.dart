@@ -1,107 +1,138 @@
 import 'package:extended_keyboard/extended_keyboard.dart';
+import 'package:extended_keyboard_example/extended_keyboard_example_routes.dart';
 import 'package:extended_keyboard_example/src/widget/button.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 
 @FFRoute(
-  name: 'fluttercandies://TestPage',
-  routeName: 'TestPage',
+  name: 'fluttercandies://TestPage1',
+  routeName: 'TestPage1',
   description: 'Show how to build chat list quickly',
   exts: <String, dynamic>{
     'order': 10,
     'group': 'Simple',
   },
 )
-class TestPage extends StatefulWidget {
-  const TestPage({Key? key}) : super(key: key);
+class TestPage1 extends StatefulWidget {
+  const TestPage1({Key? key}) : super(key: key);
 
   @override
-  State<TestPage> createState() => _TestPageState();
+  State<TestPage1> createState() => _TestPage1State();
 }
 
-class _TestPageState extends State<TestPage> {
+class _TestPage1State extends State<TestPage1> {
   final TextEditingController _controller = TextEditingController();
-  final ExtendedTextInputType _textInputType =
-      const ExtendedTextInputType(name: '测试');
+
   final FocusNode _focusNode = FocusNode();
+  late List<KeyboardConfiguration> _configurations;
   @override
   void initState() {
     super.initState();
-    // KeyboardBindingMixin.binding.register(
-    //   textInputType: _textInputType,
-    //   configuration: KeyboardConfiguration(
-    //     getKeyboardHeight: (double? systemKeyboardHeight) =>
-    //         systemKeyboardHeight ?? 200,
-    //     builder: () {
-    //       return _buildCustomKeyboard();
-    //     },
-    //     textInputTypeName: '测试',
-    //   ),
-    // );
+    _configurations = <KeyboardConfiguration>[
+      KeyboardConfiguration(
+        getKeyboardHeight: (double? systemKeyboardHeight) =>
+            systemKeyboardHeight ?? 200,
+        builder: () {
+          return _buildCustomKeyboard(true);
+        },
+        textInputTypeName: '测试',
+      ),
+      KeyboardConfiguration(
+        getKeyboardHeight: (double? systemKeyboardHeight) =>
+            systemKeyboardHeight ?? 200,
+        builder: () {
+          return _buildCustomKeyboard(false);
+        },
+        textInputTypeName: '测试1',
+      ),
+    ];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    // KeyboardBindingMixin.binding.unregister(
-    //   textInputType: _textInputType,
-    // );
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('TestPage')),
+      appBar: AppBar(
+        title: const Text('TestPage'),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(Routes.fluttercandiesTestPage1);
+            },
+            icon: const Icon(Icons.pages),
+          ),
+        ],
+      ),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: true,
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () {
-            _focusNode.unfocus();
-          },
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: ListView.builder(
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text('item $index'),
-                    );
-                  },
-                  itemCount: 200,
+        child: TextInputBuilder(
+          body: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              _focusNode.unfocus();
+            },
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: ListView.builder(
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('item $index'),
+                      );
+                    },
+                    itemCount: 200,
+                  ),
                 ),
-              ),
-              TextField(
-                focusNode: _focusNode,
-                keyboardType: _textInputType,
-                controller: _controller,
-                decoration: const InputDecoration(hintText: '测试'),
-                // maxLines: null,
-                // keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.next,
-              ),
-              const TextField(
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-              ),
-              const TextField(
-                keyboardType: TextInputType.visiblePassword,
-                textInputAction: TextInputAction.next,
-              ),
-            ],
+                TextField(
+                  focusNode: _focusNode,
+                  keyboardType: _configurations[0].textInputType,
+                  controller: _controller,
+                  decoration: const InputDecoration(hintText: '测试'),
+                  // maxLines: null,
+                  // keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.next,
+                ),
+                TextField(
+                  keyboardType: _configurations[1].textInputType,
+                  controller: _controller,
+                  decoration: const InputDecoration(hintText: '测试1'),
+                  // maxLines: null,
+                  // keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.next,
+                ),
+                const TextField(
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                ),
+                const TextField(
+                  keyboardType: TextInputType.visiblePassword,
+                  textInputAction: TextInputAction.next,
+                ),
+              ],
+            ),
           ),
+          configurations: _configurations,
         ),
       ),
     );
   }
 
-  Material _buildCustomKeyboard() {
+  Material _buildCustomKeyboard(bool test) {
     return Material(
       //shadowColor: Colors.grey,
-      color: Colors.grey.withOpacity(0.3),
+      color: test ? Colors.blue : Colors.grey.withOpacity(0.3),
       //elevation: 8,
       child: Padding(
         padding: const EdgeInsets.only(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 // ignore: depend_on_referenced_packages
@@ -13,7 +14,9 @@ class SystemKeyboard with WidgetsBindingObserver {
   SystemKeyboard._();
   static final SystemKeyboard _systemKeyboard = SystemKeyboard._();
   static final List<double> _keyboardHeights = <double>[];
-  ValueNotifier<double> afterKeyboardLayout = ValueNotifier<double>(0);
+
+  /// The keyboardHeight = the height of keyboard
+  ValueNotifier<double> afterKeyboardLayoutFinshed = ValueNotifier<double>(0);
   double? _keyboardHeight;
   final void Function() _doJob = () {
     final double currentHeight =
@@ -30,7 +33,7 @@ class SystemKeyboard with WidgetsBindingObserver {
     } else {
       _keyboardHeights.clear();
     }
-    SystemKeyboard().afterKeyboardLayout.value = currentHeight;
+    SystemKeyboard().afterKeyboardLayoutFinshed.value = max(0, currentHeight);
   }.debounce(const Duration(milliseconds: 100));
 
   double? get keyboardHeight {
@@ -39,6 +42,10 @@ class SystemKeyboard with WidgetsBindingObserver {
     }
     return _keyboardHeight;
   }
+
+  static double get safeBottom =>
+      WidgetsBinding.instance.window.viewPadding.bottom /
+      WidgetsBinding.instance.window.devicePixelRatio;
 
   @override
   void didChangeMetrics() {

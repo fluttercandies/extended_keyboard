@@ -10,6 +10,7 @@
 const List<String> routeNames = <String>[
   'fluttercandies://ChatDemo',
   'fluttercandies://TestPage',
+  'fluttercandies://TestPage1',
   'fluttercandies://demogrouppage',
   'fluttercandies://mainpage',
 ];
@@ -47,6 +48,21 @@ class Routes {
   ///
   /// [exts] : {'order': 10, 'group': 'Simple'}
   static const String fluttercandiesTestPage = 'fluttercandies://TestPage';
+
+  /// 'Show how to build chat list quickly'
+  ///
+  /// [name] : 'fluttercandies://TestPage1'
+  ///
+  /// [routeName] : 'TestPage1'
+  ///
+  /// [description] : 'Show how to build chat list quickly'
+  ///
+  /// [constructors] :
+  ///
+  /// TestPage1 : [Key? key]
+  ///
+  /// [exts] : {'order': 10, 'group': 'Simple'}
+  static const String fluttercandiesTestPage1 = 'fluttercandies://TestPage1';
 
   /// 'DemoGroupPage'
   ///

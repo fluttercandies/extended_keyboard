@@ -16,21 +16,21 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
   static KeyboardBindingMixin get binding =>
       WidgetsBinding.instance as KeyboardBindingMixin;
 
-  final Map<ExtendedTextInputType, KeyboardConfiguration> _configurations =
-      <ExtendedTextInputType, KeyboardConfiguration>{};
+  final Map<ModalRoute<Object?>, List<KeyboardConfiguration>> _configurations =
+      <ModalRoute<Object?>, List<KeyboardConfiguration>>{};
 
   ValueNotifier<bool> showKeyboardNotifier = ValueNotifier<bool>(false);
 
   KeyboardConfiguration? keyboardHandler;
   void register({
-    required ExtendedTextInputType textInputType,
-    required KeyboardConfiguration configuration,
+    required ModalRoute<Object?> route,
+    required List<KeyboardConfiguration> configurations,
   }) {
-    _configurations[textInputType] = configuration;
+    _configurations[route] = configurations;
   }
 
-  void unregister({required ExtendedTextInputType textInputType}) {
-    _configurations.remove(textInputType);
+  void unregister({required ModalRoute<Object?> route}) {
+    _configurations.remove(route);
   }
 
   void attach(MethodCall methodCall) {}
@@ -48,9 +48,6 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
     if (channel == SystemChannels.textInput.name) {
       final MethodCall methodCall = codec.decodeMethodCall(message);
 
-      if (kDebugMode && false) {
-        print('xxx ${methodCall.method}');
-      }
       switch (methodCall.method) {
         case 'TextInput.show':
           if (keyboardHandler != null) {
@@ -74,11 +71,18 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
           connectionId = methodCall.arguments[0] as int;
           final String name =
               methodCall.arguments[1]['inputType']['name'] as String;
-          for (final ExtendedTextInputType key in _configurations.keys) {
-            if (key.name == name) {
-              keyboardHandler = _configurations[key];
-              _hideSystemKeyBoardIfNeed();
-              return null;
+
+          for (final ModalRoute<Object?> route in _configurations.keys) {
+            if (route.isCurrent) {
+              final List<KeyboardConfiguration> configs =
+                  _configurations[route]!;
+              for (final KeyboardConfiguration config in configs) {
+                if (name == config.textInputType.name) {
+                  keyboardHandler = config;
+                  _hideSystemKeyBoardIfNeed();
+                  return null;
+                }
+              }
             }
           }
           break;
@@ -156,8 +160,10 @@ class KeyboardConfiguration {
     this.showDuration = const Duration(milliseconds: 300),
     this.hideDuration = const Duration(milliseconds: 300),
     this.resizeToAvoidBottomInset,
-    this.safeAreaBottom,
-  });
+    required String textInputTypeName,
+  }) : textInputType = ExtendedTextInputType(
+          name: '$textInputTypeName---${DateTime.now().millisecondsSinceEpoch}',
+        );
 
   final double Function(double? systemKeyboardHeight) getKeyboardHeight;
 
@@ -169,6 +175,5 @@ class KeyboardConfiguration {
 
   final bool? resizeToAvoidBottomInset;
 
-  /// Whether to add a bottom padding to avoid overlapping with system's safe area.
-  final bool? safeAreaBottom;
+  final ExtendedTextInputType textInputType;
 }

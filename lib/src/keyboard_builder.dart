@@ -27,7 +27,6 @@ class KeyboardBuilder extends StatefulWidget {
     Key? key,
     required this.body,
     required this.builder,
-    this.safeAreaBottom = true,
     this.resizeToAvoidBottomInset = true,
   }) : super(key: key);
 
@@ -36,9 +35,6 @@ class KeyboardBuilder extends StatefulWidget {
 
   /// The main body widget that is displayed behind the keyboard.
   final Widget body;
-
-  /// Whether to add a bottom padding to avoid overlapping with system's safe area.
-  final bool safeAreaBottom;
 
   /// If true the [body] and the scaffold's floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
@@ -58,8 +54,6 @@ class KeyboardBuilder extends StatefulWidget {
 class _KeyboardBuilderState extends State<KeyboardBuilder>
     with WidgetsBindingObserver {
   double _preKeyboardHeight = 0;
-
-  double _viewPaddingBottom = 0;
 
   final List<_KeyboardHeight> _keyboardHeights = <_KeyboardHeight>[];
 
@@ -125,8 +119,6 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
     _doJob?.call();
   }
 
-  bool get resizeToAvoidBottomInset => widget.resizeToAvoidBottomInset;
-
   @override
   Widget build(BuildContext context) {
     if (widget.resizeToAvoidBottomInset) {
@@ -141,31 +133,28 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
               final double keyboardHeight =
                   MediaQuery.of(context).viewInsets.bottom;
 
-              _viewPaddingBottom = max(
-                max(
-                  MediaQuery.of(context).viewPadding.bottom,
-                  _viewPaddingBottom,
-                ),
-                MediaQuery.of(context).padding.bottom,
-              );
-
               _preKeyboardHeight = keyboardHeight;
 
               switch (value) {
                 case KeyboardType.system:
                   return Container(
-                    height: keyboardHeight +
-                        (widget.safeAreaBottom
-                            ? MediaQuery.of(context).padding.bottom
-                            : 0),
+                    height: keyboardHeight,
                   );
-
                 case KeyboardType._customToSystem:
                   final double height = _keyboardHeights.isEmpty
                       ? SystemKeyboard().keyboardHeight ?? keyboardHeight
                       : _keyboardHeights.first.height;
 
-                  return Container(height: max(height, keyboardHeight));
+                  return Container(
+                    height: max(
+                      // keybaord height includes the safe bottom padding
+                      height -
+                          SystemKeyboard.safeBottom +
+                          // view padding bottom animate
+                          MediaQuery.of(context).viewPadding.bottom,
+                      keyboardHeight,
+                    ),
+                  );
 
                 case KeyboardType.custom:
                   double? height = _keyboardHeights.isEmpty
@@ -174,20 +163,17 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                           .firstWhere(
                               (_KeyboardHeight element) => element.active)
                           .height;
-                  double viewPaddingBottom = 0;
-                  if (widget.safeAreaBottom) {
-                    if (height != null) {
-                      height -= _viewPaddingBottom;
-                    }
-                    viewPaddingBottom = _viewPaddingBottom;
+
+                  if (height != null) {
+                    // keybaord height includes the safe bottom padding
+                    height -= SystemKeyboard.safeBottom;
+                    // view padding bottom animate
+                    height += MediaQuery.of(context).viewPadding.bottom;
                   }
 
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: viewPaddingBottom),
-                    child: widget.builder(
-                      context,
-                      height,
-                    ),
+                  return widget.builder(
+                    context,
+                    height,
                   );
 
                 default:
@@ -203,11 +189,7 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
       return Stack(
         children: <Widget>[
           Positioned.fill(
-            child: SafeArea(
-              bottom: widget.safeAreaBottom,
-              maintainBottomViewPadding: true,
-              child: widget.body,
-            ),
+            child: widget.body,
           ),
           Positioned.fill(
             child: ValueListenableBuilder<KeyboardType>(
@@ -216,13 +198,6 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                   (BuildContext context, KeyboardType value, Widget? child) {
                 final double keyboardHeight =
                     MediaQuery.of(context).viewInsets.bottom;
-                _viewPaddingBottom = max(
-                  max(
-                    MediaQuery.of(context).viewPadding.bottom,
-                    _viewPaddingBottom,
-                  ),
-                  MediaQuery.of(context).padding.bottom,
-                );
 
                 _preKeyboardHeight = keyboardHeight;
 
@@ -235,23 +210,16 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                                 (_KeyboardHeight element) => element.active)
                             .height;
 
-                    double viewPaddingBottom = 0;
-                    if (widget.safeAreaBottom) {
-                      if (height != null) {
-                        height -= _viewPaddingBottom;
-                      }
-                      viewPaddingBottom = _viewPaddingBottom;
+                    if (height != null) {
+                      height += MediaQuery.of(context).viewPadding.bottom;
                     }
 
                     return Column(
                       children: <Widget>[
                         const Spacer(),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: viewPaddingBottom),
-                          child: widget.builder(
-                            context,
-                            height,
-                          ),
+                        widget.builder(
+                          context,
+                          height,
                         ),
                       ],
                     );

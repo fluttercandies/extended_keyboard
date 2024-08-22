@@ -53,136 +53,138 @@ class _ChatDemoState extends State<ChatDemo> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(title: const Text('ChatDemo')),
-      body: KeyboardBuilder(
-        safeAreaBottom: true,
-        resizeToAvoidBottomInset: true,
-        builder: (BuildContext context, double? keyboardHeight) {
-          return _buildCustomKeyboard(context, keyboardHeight);
-        },
-        body: Column(children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-              controller: _controller,
-              itemBuilder: (BuildContext context, int index) {
-                final Message message = _messages[index];
-                List<Widget> children = <Widget>[
-                  ExtendedImage.asset(
-                    Assets.assets_avatar_jpg,
-                    width: 20,
-                    height: 20,
-                  ),
-                  const SizedBox(width: 5),
-                  Flexible(
-                    child: ExtendedText(
-                      message.content,
-                      specialTextSpanBuilder: _mySpecialTextSpanBuilder,
-                      maxLines: 10,
+      body: SafeArea(
+        bottom: true,
+        child: KeyboardBuilder(
+          resizeToAvoidBottomInset: true,
+          builder: (BuildContext context, double? keyboardHeight) {
+            return _buildCustomKeyboard(context, keyboardHeight);
+          },
+          body: Column(children: <Widget>[
+            Expanded(
+              child: ListView.builder(
+                controller: _controller,
+                itemBuilder: (BuildContext context, int index) {
+                  final Message message = _messages[index];
+                  List<Widget> children = <Widget>[
+                    ExtendedImage.asset(
+                      Assets.assets_avatar_jpg,
+                      width: 20,
+                      height: 20,
                     ),
-                  ),
-                ];
-                if (message.isMe) {
-                  children = children.reversed.toList();
-                }
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: message.isMe
-                        ? MainAxisAlignment.end
-                        : MainAxisAlignment.start,
-                    children: children,
-                  ),
-                );
-              },
-              itemCount: _messages.length,
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(5),
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: Colors.grey,
-                ),
-                bottom: BorderSide(
-                  color: Colors.grey,
-                ),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: ExtendedText(
+                        message.content,
+                        specialTextSpanBuilder: _mySpecialTextSpanBuilder,
+                        maxLines: 10,
+                      ),
+                    ),
+                  ];
+                  if (message.isMe) {
+                    children = children.reversed.toList();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: message.isMe
+                          ? MainAxisAlignment.end
+                          : MainAxisAlignment.start,
+                      children: children,
+                    ),
+                  );
+                },
+                itemCount: _messages.length,
               ),
             ),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: ExtendedTextField(
-                    key: _key,
-                    specialTextSpanBuilder: _mySpecialTextSpanBuilder,
-                    controller: _textEditingController,
-                    textInputAction: TextInputAction.done,
-                    strutStyle: const StrutStyle(),
-                    decoration: InputDecoration(
-                      hintText: 'Input something',
-                      border: InputBorder.none,
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            sendMessage(_textEditingController.text);
-                            _textEditingController.clear();
-                          });
-                        },
-                        child: const Icon(Icons.send),
+            Container(
+              padding: const EdgeInsets.all(5),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey,
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: ExtendedTextField(
+                      key: _key,
+                      specialTextSpanBuilder: _mySpecialTextSpanBuilder,
+                      controller: _textEditingController,
+                      textInputAction: TextInputAction.done,
+                      strutStyle: const StrutStyle(),
+                      decoration: InputDecoration(
+                        hintText: 'Input something',
+                        border: InputBorder.none,
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              sendMessage(_textEditingController.text);
+                              _textEditingController.clear();
+                            });
+                          },
+                          child: const Icon(Icons.send),
+                        ),
+                        contentPadding: const EdgeInsets.all(
+                          12.0,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.all(
-                        12.0,
-                      ),
+                      maxLines: 2,
                     ),
-                    maxLines: 2,
                   ),
-                ),
-                KeyboardTypeBuilder(
-                  builder: (
-                    BuildContext context,
-                    CustomKeyboardController controller,
-                  ) =>
-                      Row(
-                    children: <Widget>[
-                      ToggleButton(
-                        builder: (bool active) => Icon(
-                          Icons.sentiment_very_satisfied,
-                          color: active ? Colors.orange : null,
+                  KeyboardTypeBuilder(
+                    builder: (
+                      BuildContext context,
+                      CustomKeyboardController controller,
+                    ) =>
+                        Row(
+                      children: <Widget>[
+                        ToggleButton(
+                          builder: (bool active) => Icon(
+                            Icons.sentiment_very_satisfied,
+                            color: active ? Colors.orange : null,
+                          ),
+                          activeChanged: (bool active) {
+                            _keyboardPanelType = KeyboardPanelType.emoji;
+                            if (active) {
+                              controller.showKeyboard();
+                            } else {
+                              controller.hideKeyboard();
+                            }
+                          },
+                          active: controller.isCustom &&
+                              _keyboardPanelType == KeyboardPanelType.emoji,
                         ),
-                        activeChanged: (bool active) {
-                          _keyboardPanelType = KeyboardPanelType.emoji;
-                          if (active) {
-                            controller.showKeyboard();
-                          } else {
-                            controller.hideKeyboard();
-                          }
-                        },
-                        active: controller.isCustom &&
-                            _keyboardPanelType == KeyboardPanelType.emoji,
-                      ),
-                      ToggleButton(
-                        builder: (bool active) => Icon(
-                          Icons.image,
-                          color: active ? Colors.orange : null,
+                        ToggleButton(
+                          builder: (bool active) => Icon(
+                            Icons.image,
+                            color: active ? Colors.orange : null,
+                          ),
+                          activeChanged: (bool active) {
+                            _keyboardPanelType = KeyboardPanelType.image;
+                            if (active) {
+                              controller.showKeyboard();
+                            } else {
+                              controller.hideKeyboard();
+                            }
+                          },
+                          active: controller.isCustom &&
+                              _keyboardPanelType == KeyboardPanelType.image,
                         ),
-                        activeChanged: (bool active) {
-                          _keyboardPanelType = KeyboardPanelType.image;
-                          if (active) {
-                            controller.showKeyboard();
-                          } else {
-                            controller.hideKeyboard();
-                          }
-                        },
-                        active: controller.isCustom &&
-                            _keyboardPanelType == KeyboardPanelType.image,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ]),
+          ]),
+        ),
       ),
     );
   }

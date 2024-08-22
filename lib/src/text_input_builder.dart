@@ -36,6 +36,7 @@ class TextInputBuilder extends StatefulWidget {
 
 class _TextInputBuilderState extends State<TextInputBuilder> {
   ModalRoute<Object?>? _route;
+  double _preKeyboardHeight = 0;
   @override
   void initState() {
     super.initState();
@@ -93,41 +94,40 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
 
         final double systemKeyboardHeight =
             MediaQuery.of(context).viewInsets.bottom;
+        _preKeyboardHeight = systemKeyboardHeight;
         if (systemKeyboardHeight != 0) {
           duration = const Duration();
         }
         final double viewPaddingBottom =
             MediaQuery.of(context).viewPadding.bottom;
-        return Material(
-          child: Stack(
-            clipBehavior: Clip.hardEdge,
-            children: <Widget>[
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: resizeToAvoidBottomInset
-                    ? (show
-                        ? customKeyboardHeight + viewPaddingBottom
-                        : systemKeyboardHeight)
-                    : 0,
-                //duration: duration,
-                child: child!,
+        return Stack(
+          clipBehavior: Clip.hardEdge,
+          children: <Widget>[
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: resizeToAvoidBottomInset
+                  ? (show
+                      ? customKeyboardHeight + viewPaddingBottom
+                      : systemKeyboardHeight)
+                  : 0,
+              //duration: duration,
+              child: child!,
+            ),
+            AnimatedPositioned(
+              left: 0,
+              right: 0,
+              bottom: viewPaddingBottom,
+              duration: duration,
+              child: SizedBox(
+                height: customKeyboardHeight,
+                child: show
+                    ? KeyboardBindingMixin.binding.keyboardHandler?.builder()
+                    : null,
               ),
-              AnimatedPositioned(
-                left: 0,
-                right: 0,
-                bottom: viewPaddingBottom,
-                duration: duration,
-                child: SizedBox(
-                  height: customKeyboardHeight,
-                  child: show
-                      ? KeyboardBindingMixin.binding.keyboardHandler?.builder()
-                      : null,
-                ),
-              )
-            ],
-          ),
+            )
+          ],
         );
       },
       child: widget.body,

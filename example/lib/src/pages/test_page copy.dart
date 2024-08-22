@@ -22,8 +22,7 @@ class TestPage1 extends StatefulWidget {
 
 class _TestPage1State extends State<TestPage1> {
   final TextEditingController _controller = TextEditingController();
-
-  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _controller1 = TextEditingController();
   late List<KeyboardConfiguration> _configurations;
   @override
   void initState() {
@@ -33,7 +32,7 @@ class _TestPage1State extends State<TestPage1> {
         getKeyboardHeight: (double? systemKeyboardHeight) =>
             systemKeyboardHeight ?? 200,
         builder: () {
-          return _buildCustomKeyboard(true);
+          return _buildCustomKeyboard(TextInputAction.next, _controller);
         },
         textInputTypeName: '测试',
       ),
@@ -41,9 +40,10 @@ class _TestPage1State extends State<TestPage1> {
         getKeyboardHeight: (double? systemKeyboardHeight) =>
             systemKeyboardHeight ?? 200,
         builder: () {
-          return _buildCustomKeyboard(false);
+          return _buildCustomKeyboard(TextInputAction.previous, _controller1);
         },
         textInputTypeName: '测试1',
+        // resizeToAvoidBottomInset: false,
       ),
     ];
   }
@@ -79,7 +79,7 @@ class _TestPage1State extends State<TestPage1> {
           body: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () {
-              _focusNode.unfocus();
+              FocusManager.instance.primaryFocus?.unfocus();
             },
             child: Column(
               children: <Widget>[
@@ -96,29 +96,24 @@ class _TestPage1State extends State<TestPage1> {
                   ),
                 ),
                 TextField(
-                  focusNode: _focusNode,
-                  keyboardType: _configurations[0].textInputType,
+                  keyboardType: _configurations[0].keyboardType,
                   controller: _controller,
                   decoration: const InputDecoration(hintText: '测试'),
-                  // maxLines: null,
-                  // keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.next,
                 ),
                 TextField(
-                  keyboardType: _configurations[1].textInputType,
-                  controller: _controller,
+                  keyboardType: _configurations[1].keyboardType,
+                  controller: _controller1,
                   decoration: const InputDecoration(hintText: '测试1'),
-                  // maxLines: null,
-                  // keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.next,
                 ),
                 const TextField(
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
                 ),
                 const TextField(
-                  keyboardType: TextInputType.visiblePassword,
                   textInputAction: TextInputAction.next,
+                ),
+                const TextField(
+                  textInputAction: TextInputAction.done,
                 ),
               ],
             ),
@@ -129,10 +124,13 @@ class _TestPage1State extends State<TestPage1> {
     );
   }
 
-  Material _buildCustomKeyboard(bool test) {
+  Material _buildCustomKeyboard(
+    TextInputAction inputAction,
+    TextEditingController controller,
+  ) {
     return Material(
       //shadowColor: Colors.grey,
-      color: test ? Colors.blue : Colors.grey.withOpacity(0.3),
+      color: const Color.fromARGB(255, 119, 116, 116),
       //elevation: 8,
       child: Padding(
         padding: const EdgeInsets.only(
@@ -157,21 +155,24 @@ class _TestPage1State extends State<TestPage1> {
                             flex: 5,
                             child: NumberButton(
                               number: 1,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                           Expanded(
                             flex: 5,
                             child: NumberButton(
                               number: 2,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                           Expanded(
                             flex: 5,
                             child: NumberButton(
                               number: 3,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                         ],
@@ -184,21 +185,24 @@ class _TestPage1State extends State<TestPage1> {
                             flex: 5,
                             child: NumberButton(
                               number: 4,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                           Expanded(
                             flex: 5,
                             child: NumberButton(
                               number: 5,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                           Expanded(
                             flex: 5,
                             child: NumberButton(
                               number: 6,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                         ],
@@ -211,21 +215,24 @@ class _TestPage1State extends State<TestPage1> {
                             flex: 5,
                             child: NumberButton(
                               number: 7,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                           Expanded(
                             flex: 5,
                             child: NumberButton(
                               number: 8,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                           Expanded(
                             flex: 5,
                             child: NumberButton(
                               number: 9,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                         ],
@@ -239,7 +246,7 @@ class _TestPage1State extends State<TestPage1> {
                             child: CustomButton(
                               child: const Text('.'),
                               onTap: () {
-                                insertText('.');
+                                controller.insertText('.');
                               },
                             ),
                           ),
@@ -247,7 +254,8 @@ class _TestPage1State extends State<TestPage1> {
                             flex: 5,
                             child: NumberButton(
                               number: 0,
-                              insertText: insertText,
+                              insertText: (String text) =>
+                                  controller.insertText(text),
                             ),
                           ),
                           Expanded(
@@ -255,7 +263,7 @@ class _TestPage1State extends State<TestPage1> {
                             child: CustomButton(
                               child: const Icon(Icons.arrow_downward),
                               onTap: () {
-                                _focusNode.unfocus();
+                                FocusManager.instance.primaryFocus?.unfocus();
                               },
                             ),
                           ),
@@ -274,16 +282,15 @@ class _TestPage1State extends State<TestPage1> {
                       child: CustomButton(
                         child: const Icon(Icons.backspace),
                         onTap: () {
-                          deleteText();
+                          controller.delete();
                         },
                       ),
                     ),
                     Expanded(
                         child: CustomButton(
-                      child: const Icon(Icons.keyboard_return),
+                      child: Text(inputAction.name),
                       onTap: () {
-                        _controller.performAction(TextInputAction.next);
-                        // insertText('\n');
+                        controller.performAction(inputAction);
                       },
                     ))
                   ],
@@ -294,13 +301,5 @@ class _TestPage1State extends State<TestPage1> {
         ),
       ),
     );
-  }
-
-  void insertText(String text) {
-    _controller.insertText(text);
-  }
-
-  void deleteText() {
-    _controller.delete();
   }
 }

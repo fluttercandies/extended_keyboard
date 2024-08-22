@@ -33,10 +33,6 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
     _configurations.remove(route);
   }
 
-  void attach(MethodCall methodCall) {}
-
-  void detach() {}
-
   MethodCodec get codec => SystemChannels.textInput.codec;
 
   bool get isShow => showKeyboardNotifier.value;
@@ -77,7 +73,7 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
               final List<KeyboardConfiguration> configs =
                   _configurations[route]!;
               for (final KeyboardConfiguration config in configs) {
-                if (name == config.textInputType.name) {
+                if (name == config.keyboardType.name) {
                   keyboardHandler = config;
                   _hideSystemKeyBoardIfNeed();
                   return null;
@@ -161,7 +157,7 @@ class KeyboardConfiguration {
     this.hideDuration = const Duration(milliseconds: 300),
     this.resizeToAvoidBottomInset,
     required String textInputTypeName,
-  }) : textInputType = ExtendedTextInputType(
+  }) : keyboardType = ExtendedTextInputType(
           name: '$textInputTypeName---${DateTime.now().millisecondsSinceEpoch}',
         );
 
@@ -175,5 +171,5 @@ class KeyboardConfiguration {
 
   final bool? resizeToAvoidBottomInset;
 
-  final ExtendedTextInputType textInputType;
+  final ExtendedTextInputType keyboardType;
 }

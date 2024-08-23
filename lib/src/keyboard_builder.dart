@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'keyboard_height.dart';
 import 'system_keyboard.dart';
 import 'utils.dart';
 import 'package:flutter/foundation.dart';
@@ -56,8 +55,6 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
     with WidgetsBindingObserver {
   double _preKeyboardHeight = 0;
 
-  final List<KeyboardHeight> _keyboardHeights = <KeyboardHeight>[];
-
   void Function()? _doJob;
   final CustomKeyboardController _controller =
       CustomKeyboardController(KeyboardType.system);
@@ -97,19 +94,8 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
             _controller._setValue(KeyboardType.system);
           }
 
-          final KeyboardHeight height =
-              KeyboardHeight(height: currentHeight, isActive: true);
-
-          if (!_keyboardHeights.contains(height)) {
-            _keyboardHeights.add(height);
-          }
-
-          for (final KeyboardHeight element in _keyboardHeights) {
-            element.isActive = element == height;
-          }
-        } else if (_controller.value == KeyboardType.system) {
-          _keyboardHeights.clear();
-        }
+          SystemKeyboard().updateHeight(currentHeight);
+        } else if (_controller.value == KeyboardType.system) {}
       }
     }.debounce(
       const Duration(
@@ -142,9 +128,9 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                     height: keyboardHeight,
                   );
                 case KeyboardType._customToSystem:
-                  final double height = _keyboardHeights.isEmpty
-                      ? SystemKeyboard().keyboardHeight ?? keyboardHeight
-                      : _keyboardHeights.first.height;
+                  final double height =
+                      SystemKeyboard().getSystemKeyboardHeightByName() ??
+                          keyboardHeight;
 
                   return Container(
                     height: max(
@@ -158,18 +144,14 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                   );
 
                 case KeyboardType.custom:
-                  double? height = _keyboardHeights.isEmpty
-                      ? SystemKeyboard().keyboardHeight
-                      : _keyboardHeights
-                          .firstWhere(
-                              (KeyboardHeight element) => element.isActive)
-                          .height;
+                  double? height = SystemKeyboard().lastKeyboardHeight;
 
                   if (height != null) {
                     // keybaord height includes the safe bottom padding
                     height -= SystemKeyboard.safeBottom;
                     // view padding bottom animate
                     height += MediaQuery.of(context).viewPadding.bottom;
+                    height = max(0, height);
                   }
 
                   return widget.builder(
@@ -204,12 +186,7 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
 
                 switch (value) {
                   case KeyboardType.custom:
-                    double? height = _keyboardHeights.isEmpty
-                        ? SystemKeyboard().keyboardHeight
-                        : _keyboardHeights
-                            .firstWhere(
-                                (KeyboardHeight element) => element.isActive)
-                            .height;
+                    double? height = SystemKeyboard().lastKeyboardHeight;
 
                     if (height != null) {
                       height += MediaQuery.of(context).viewPadding.bottom;

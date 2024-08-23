@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 // ignore: depend_on_referenced_packages
@@ -8,64 +7,40 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'keyboard_binary_messenger.dart';
-import 'keyboard_height.dart';
 import 'utils.dart';
-import 'dart:collection';
 
 class SystemKeyboard with WidgetsBindingObserver {
   factory SystemKeyboard() => _systemKeyboard;
 
   SystemKeyboard._();
   static final SystemKeyboard _systemKeyboard = SystemKeyboard._();
-  static final List<KeyboardHeight> _keyboardHeights = <KeyboardHeight>[];
 
-  List<KeyboardHeight> get keyboardHeights => _keyboardHeights;
-  final List<SystemKeyboardInfo> _systemKeyboardHeights =
-      <SystemKeyboardInfo>[];
+  final List<SystemKeyboardHeight> _systemKeyboardHeights =
+      <SystemKeyboardHeight>[];
 
   /// The keyboardHeight = the height of keyboard
   ValueNotifier<double> afterKeyboardLayoutFinshed = ValueNotifier<double>(0);
-  SystemKeyboardInfo? _keyboardHeight;
+  SystemKeyboardHeight? _lastKeyboardHeight;
 
   final void Function() _doJob = () {
     final double currentHeight =
         WidgetsBinding.instance.window.viewInsets.bottom /
             WidgetsBinding.instance.window.devicePixelRatio;
     if (currentHeight != 0) {
-      if (_keyboardHeights.isEmpty) {
-        _systemKeyboard._updateHeight(
-          SystemKeyboardInfo(
-            name: KeyboardBindingMixin.binding.name ?? 'system',
-            height: currentHeight,
-          ),
-        );
-      }
-
-      final KeyboardHeight height =
-          KeyboardHeight(height: currentHeight, isActive: true);
-
-      if (!_keyboardHeights.contains(height)) {
-        _keyboardHeights.add(height);
-      }
-
-      for (final KeyboardHeight element in _keyboardHeights) {
-        element.isActive = element == height;
-      }
-    } else {
-      _keyboardHeights.clear();
+      _systemKeyboard.updateHeight(currentHeight);
     }
     SystemKeyboard().afterKeyboardLayoutFinshed.value = currentHeight;
   }.debounce(const Duration(milliseconds: 100));
 
-  double? get keyboardHeight {
-    if (_keyboardHeight == null) {
+  double? get lastKeyboardHeight {
+    if (_lastKeyboardHeight == null) {
       init();
     }
-    return _keyboardHeight?.height;
+    return _lastKeyboardHeight?.height;
   }
 
   double? getSystemKeyboardHeightByName() {
-    for (final SystemKeyboardInfo element in _systemKeyboardHeights) {
+    for (final SystemKeyboardHeight element in _systemKeyboardHeights) {
       if (element.name == KeyboardBindingMixin.binding.name) {
         return element.height;
       }
@@ -90,11 +65,11 @@ class SystemKeyboard with WidgetsBindingObserver {
       _systemKeyboardHeights.clear();
       for (final dynamic element in list) {
         _systemKeyboardHeights.add(
-          SystemKeyboardInfo.fromJson(element as Map<String, dynamic>),
+          SystemKeyboardHeight.fromJson(element as Map<String, dynamic>),
         );
       }
       if (_systemKeyboardHeights.isNotEmpty) {
-        _keyboardHeight = _systemKeyboardHeights.last;
+        _lastKeyboardHeight = _systemKeyboardHeights.last;
       }
     }
 
@@ -110,9 +85,21 @@ class SystemKeyboard with WidgetsBindingObserver {
     return file;
   }
 
-  void _updateHeight(SystemKeyboardInfo info) {
+  void updateHeight(double currentHeight) {
+    SystemKeyboardHeight info = SystemKeyboardHeight(
+      name: KeyboardBindingMixin.binding.name ?? 'SystemKeyboard',
+      height: currentHeight,
+    );
+    _lastKeyboardHeight = info;
     final int oldIndex = _systemKeyboardHeights.indexOf(info);
-    _systemKeyboardHeights.remove(info);
+    if (oldIndex >= 0) {
+      // The TextInputType maybe has many heights, alway use first one.
+      final SystemKeyboardHeight oldInfo =
+          _systemKeyboardHeights.removeAt(oldIndex);
+      if (info.name != 'SystemKeyboard') {
+        info = oldInfo;
+      }
+    }
     _systemKeyboardHeights.add(info);
     final int newIndex = _systemKeyboardHeights.indexOf(info);
     if (oldIndex != newIndex) {
@@ -124,13 +111,13 @@ class SystemKeyboard with WidgetsBindingObserver {
 }
 
 @immutable
-class SystemKeyboardInfo {
-  const SystemKeyboardInfo({
+class SystemKeyboardHeight {
+  const SystemKeyboardHeight({
     required this.name,
     required this.height,
   });
-  factory SystemKeyboardInfo.fromJson(Map<String, dynamic> json) {
-    return SystemKeyboardInfo(
+  factory SystemKeyboardHeight.fromJson(Map<String, dynamic> json) {
+    return SystemKeyboardHeight(
       name: json['name'] as String,
       height: json['height'] as double,
     );
@@ -141,7 +128,7 @@ class SystemKeyboardInfo {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SystemKeyboardInfo &&
+      other is SystemKeyboardHeight &&
           runtimeType == other.runtimeType &&
           name == other.name
       // && height == other.height

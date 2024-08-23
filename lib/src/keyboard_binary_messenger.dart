@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -60,7 +58,7 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
           if (keyboardHandler != null) {
             showKeyboardNotifier.value = keyboardHandler;
             keyboardHandler = null;
-            return null;
+            return codec.encodeSuccessEnvelope(null);
           }
 
           break;
@@ -76,7 +74,7 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
                 if (name == config.keyboardType.name) {
                   keyboardHandler = config;
                   _hideSystemKeyBoardIfNeed();
-                  return null;
+                  return codec.encodeSuccessEnvelope(null);
                 }
               }
             }
@@ -172,19 +170,6 @@ class KeyboardConfiguration {
   final bool? resizeToAvoidBottomInset;
 
   final ExtendedTextInputType keyboardType;
-}
-
-/// Enum representing different types of keyboards.
-enum KeyboardState {
-  none,
-
-  /// system keyboard
-  system,
-
-  /// custom keyboard
-  custom,
-  _customToSystem,
-  _systemToCustom,
 }
 
 class KeyboardConfigurationController extends ChangeNotifier

@@ -8,7 +8,7 @@ import 'extended_keyboard_example_routes.dart';
 
 Future<void> main() async {
   KeyboardBinding();
-  // await SystemKeyboard().init();
+
   runApp(const MyApp());
 }
 
@@ -23,12 +23,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // builder: (BuildContext context, Widget? child) {
-      //   return KeyboardApp(
-      //     body: child!,
-      //     resizeToAvoidBottomInset: true,
-      //   );
-      // },
       initialRoute: Routes.fluttercandiesMainpage,
       onGenerateRoute: (RouteSettings settings) {
         return onGenerateRoute(

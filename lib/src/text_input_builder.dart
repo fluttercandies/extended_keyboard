@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:extended_keyboard/extended_keyboard.dart';
-import 'package:extended_keyboard/src/keyboard_height.dart';
 import 'package:flutter/material.dart';
 
 class TextInputBuilder extends StatefulWidget {
@@ -88,13 +87,7 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
   }
 
   double? get systemKeyboardHeight {
-    if (SystemKeyboard().keyboardHeights.isNotEmpty) {
-      return SystemKeyboard()
-          .keyboardHeights
-          .firstWhere((KeyboardHeight element) => element.isActive)
-          .height;
-    }
-    return SystemKeyboard().keyboardHeight;
+    return SystemKeyboard().lastKeyboardHeight;
   }
 
   KeyboardConfiguration? preConfiguration;
@@ -117,11 +110,12 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
             keyboardHandler?.resizeToAvoidBottomInset ??
                 widget.resizeToAvoidBottomInset;
 
-        final double customKeyboardHeight =
+        final double customKeyboardHeight = max(
+            0,
             (keyboardHandler?.getKeyboardHeight(systemKeyboardHeight) ??
                     systemKeyboardHeight ??
                     widget.keyboardHeight) -
-                SystemKeyboard.safeBottom;
+                SystemKeyboard.safeBottom);
 
         Duration duration = (show
                 ? keyboardHandler?.showDuration

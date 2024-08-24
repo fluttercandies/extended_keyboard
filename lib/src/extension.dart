@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import 'keyboard_binary_messenger.dart';
+import 'text_input/keyboard_binding.dart';
 
 extension TextEditingControllerE on TextEditingController {
   /// Insert text at the current selection or replace the current selection with
@@ -85,6 +85,7 @@ extension TextEditingControllerE on TextEditingController {
     return value;
   }
 
+  /// 'TextInputClient.performAction'
   void performAction(TextInputAction action) {
     final int? id = KeyboardBindingMixin.binding.connectionId;
     final MethodCall methodCall =

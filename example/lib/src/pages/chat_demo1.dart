@@ -40,7 +40,7 @@ class ChatDemo1 extends StatefulWidget {
 }
 
 class _ChatDemo1State extends State<ChatDemo1> {
-  KeyboardPanelType _keyboardPanelType = KeyboardPanelType.emoji;
+  KeyboardPanelType _keyboardPanelType = KeyboardPanelType.number;
   final GlobalKey<ExtendedTextFieldState> _key =
       GlobalKey<ExtendedTextFieldState>();
   final TextEditingController _textEditingController = TextEditingController();
@@ -53,6 +53,8 @@ class _ChatDemo1State extends State<ChatDemo1> {
   final List<Message> _messages = <Message>[];
 
   late List<KeyboardConfiguration> _configurations;
+
+  Duration duration = const Duration(milliseconds: 300);
 
   @override
   void initState() {
@@ -68,9 +70,17 @@ class _ChatDemo1State extends State<ChatDemo1> {
               KeyboardPanelType.values[i],
             );
           },
-          textInputTypeName: KeyboardPanelType.values[i].toString(),
+          keyboardName: KeyboardPanelType.values[i].toString(),
+          showDuration: duration,
+          hideDuration: duration,
         ),
     ];
+    _focusNode.addListener(_onFocusChanged);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -480,6 +490,19 @@ class _ChatDemo1State extends State<ChatDemo1> {
       }
     }
     return _configurations.first.keyboardType;
+  }
+
+  void _onFocusChanged() {
+    if (!_focusNode.hasFocus &&
+        _keyboardPanelType != KeyboardPanelType.number) {
+      Future<void>.delayed(duration, () {
+        if (mounted) {
+          setState(() {
+            _keyboardPanelType = KeyboardPanelType.number;
+          });
+        }
+      });
+    }
   }
 }
 

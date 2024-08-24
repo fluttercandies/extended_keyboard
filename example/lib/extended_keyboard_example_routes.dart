@@ -19,13 +19,13 @@ const List<String> routeNames = <String>[
 class Routes {
   const Routes._();
 
-  /// 'Show how to build chat list quickly'
+  /// 'Show how to build chat page which include custom keyboard with KeyboardBuilder quickly'
   ///
   /// [name] : 'fluttercandies://ChatDemo'
   ///
   /// [routeName] : 'ChatDemo'
   ///
-  /// [description] : 'Show how to build chat list quickly'
+  /// [description] : 'Show how to build chat page which include custom keyboard with KeyboardBuilder quickly'
   ///
   /// [constructors] :
   ///
@@ -34,19 +34,19 @@ class Routes {
   /// [exts] : {'order': 0, 'group': 'Simple'}
   static const String fluttercandiesChatDemo = 'fluttercandies://ChatDemo';
 
-  /// 'Show how to build chat list quickly'
+  /// 'Show how to build chat page which include custom keyboard with TextInputBuilder quickly'
   ///
   /// [name] : 'fluttercandies://ChatDemo1'
   ///
   /// [routeName] : 'ChatDemo1'
   ///
-  /// [description] : 'Show how to build chat list quickly'
+  /// [description] : 'Show how to build chat page which include custom keyboard with TextInputBuilder quickly'
   ///
   /// [constructors] :
   ///
   /// ChatDemo1 : [Key? key]
   ///
-  /// [exts] : {'order': 0, 'group': 'Simple'}
+  /// [exts] : {'order': 1, 'group': 'Simple'}
   static const String fluttercandiesChatDemo1 = 'fluttercandies://ChatDemo1';
 
   /// 'Show how to build custom TextInput quickly'
@@ -61,7 +61,7 @@ class Routes {
   ///
   /// TextInputDemo : [Key? key]
   ///
-  /// [exts] : {'order': 10, 'group': 'Simple'}
+  /// [exts] : {'order': 2, 'group': 'Simple'}
   static const String fluttercandiesTextInput = 'fluttercandies://TextInput';
 
   /// 'DemoGroupPage'

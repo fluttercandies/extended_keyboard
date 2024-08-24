@@ -34,42 +34,47 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: const Text('loading_more_list'),
-        actions: <Widget>[
-          ButtonTheme(
-            minWidth: 0.0,
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: TextButton(
-              child: const Text(
-                'Github',
-                style: TextStyle(
-                  decorationStyle: TextDecorationStyle.solid,
-                  decoration: TextDecoration.underline,
-                  color: Colors.white,
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: const Text('extended_keyboard'),
+          actions: <Widget>[
+            ButtonTheme(
+              minWidth: 0.0,
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: TextButton(
+                child: const Text(
+                  'Github',
+                  style: TextStyle(
+                    decorationStyle: TextDecorationStyle.solid,
+                    decoration: TextDecoration.underline,
+                    color: Colors.white,
+                  ),
                 ),
+                onPressed: () {
+                  launchUrl(Uri.parse(
+                      'https://github.com/fluttercandies/extended_keyboard'));
+                },
               ),
-              onPressed: () {
-                launchUrl(Uri.parse(
-                    'https://github.com/fluttercandies/extended_keyboard'));
-              },
             ),
-          ),
-          ButtonTheme(
-            padding: const EdgeInsets.only(right: 10.0),
-            minWidth: 0.0,
-            child: TextButton(
-              child: const Text('QQ'),
-              onPressed: () {
-                launchUrl(Uri.parse('https://jq.qq.com/?_wv=1027&k=5bcc0gy'));
-              },
-            ),
-          )
-        ],
-      ),
-      body: ListView.builder(
+            ButtonTheme(
+              padding: const EdgeInsets.only(right: 10.0),
+              minWidth: 0.0,
+              child: TextButton(
+                child: const Text('QQ'),
+                onPressed: () {
+                  launchUrl(Uri.parse('https://jq.qq.com/?_wv=1027&k=5bcc0gy'));
+                },
+              ),
+            )
+          ],
+        ),
+        body: _getBody(context));
+  }
+
+  Widget _getBody(BuildContext context) {
+    if (routesGroup.length > 1) {
+      return ListView.builder(
         itemBuilder: (BuildContext c, int index) {
           // final RouteResult page = routes[index];
           final String type = routesGroup.keys.toList()[index];
@@ -85,7 +90,7 @@ class MainPage extends StatelessWidget {
                       //style: TextStyle(inherit: false),
                     ),
                     Text(
-                      '$type demos of loading_more_list',
+                      '$type demos of extended_keyboard',
                       //page.description,
                       style: const TextStyle(color: Colors.grey),
                     )
@@ -101,8 +106,40 @@ class MainPage extends StatelessWidget {
               ));
         },
         itemCount: routesGroup.length,
-      ),
-    );
+      );
+    } else {
+      final List<DemoRouteResult> routes = routesGroup.entries.first.value
+        ..sort((DemoRouteResult a, DemoRouteResult b) =>
+            a.order.compareTo(b.order));
+      return ListView.builder(
+        itemBuilder: (BuildContext context, int index) {
+          final DemoRouteResult page = routes[index];
+          return Container(
+            margin: const EdgeInsets.all(20.0),
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    '${index + 1}.${page.routeResult.routeName!}',
+                    //style: TextStyle(inherit: false),
+                  ),
+                  Text(
+                    page.routeResult.description!,
+                    style: const TextStyle(color: Colors.grey),
+                  )
+                ],
+              ),
+              onTap: () {
+                Navigator.pushNamed(context, page.routeResult.name!);
+              },
+            ),
+          );
+        },
+        itemCount: routes.length,
+      );
+    }
   }
 }
 

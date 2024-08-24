@@ -16,6 +16,7 @@ enum KeyboardType {
   _customToSystem,
 }
 
+/// A builder function that returns a widget based on the keyboard height.
 typedef KeyboardBuilderCallback = Widget Function(
   BuildContext context,
   double? keyboardHeight,
@@ -54,7 +55,7 @@ class KeyboardBuilder extends StatefulWidget {
 class _KeyboardBuilderState extends State<KeyboardBuilder>
     with WidgetsBindingObserver {
   double _preKeyboardHeight = 0;
-
+  ModalRoute<Object?>? _route;
   void Function()? _doJob;
   final CustomKeyboardController _controller =
       CustomKeyboardController(KeyboardType.system);
@@ -66,7 +67,14 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _route = ModalRoute.of(context);
+  }
+
+  @override
   void dispose() {
+    SystemKeyboard().clearCurrentRouteLastKeyboardHeight(_route!);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -93,9 +101,11 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
           if (_controller.value != KeyboardType.system) {
             _controller._setValue(KeyboardType.system);
           }
-
-          SystemKeyboard().updateHeight(currentHeight);
-        } else if (_controller.value == KeyboardType.system) {}
+          SystemKeyboard().updateHeight(
+            currentHeight,
+            route: ModalRoute.of(context),
+          );
+        }
       }
     }.debounce(
       const Duration(
@@ -144,7 +154,10 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
                   );
 
                 case KeyboardType.custom:
-                  double? height = SystemKeyboard().lastKeyboardHeight;
+                  double? height =
+                      SystemKeyboard().getCurrentRouteLastKeyboardHeight(
+                    ModalRoute.of(context),
+                  );
 
                   if (height != null) {
                     // keybaord height includes the safe bottom padding
@@ -186,7 +199,10 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
 
                 switch (value) {
                   case KeyboardType.custom:
-                    double? height = SystemKeyboard().lastKeyboardHeight;
+                    double? height =
+                        SystemKeyboard().getCurrentRouteLastKeyboardHeight(
+                      ModalRoute.of(context),
+                    );
 
                     if (height != null) {
                       height += MediaQuery.of(context).viewPadding.bottom;

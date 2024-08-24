@@ -34,7 +34,7 @@ class _TextInputDemoState extends State<TextInputDemo> {
         builder: () {
           return _buildCustomKeyboard(TextInputAction.next, _controller);
         },
-        textInputTypeName: 'custom_number',
+        keyboardName: 'custom_number',
         // showDuration: const Duration(seconds: 1),
         // hideDuration: const Duration(seconds: 1),
       ),
@@ -44,7 +44,7 @@ class _TextInputDemoState extends State<TextInputDemo> {
         builder: () {
           return _buildCustomKeyboard(TextInputAction.previous, _controller1);
         },
-        textInputTypeName: 'custom_number1',
+        keyboardName: 'custom_number1',
         // resizeToAvoidBottomInset: false,
       ),
     ];

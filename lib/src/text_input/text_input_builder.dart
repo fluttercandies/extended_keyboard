@@ -3,6 +3,11 @@ import 'dart:math';
 import 'package:extended_keyboard/extended_keyboard.dart';
 import 'package:flutter/material.dart';
 
+/// A stateful widget that builds a customizable text input UI.
+///
+/// `TextInputBuilder` is designed to provide a custom text input experience
+/// by managing different keyboard configurations and handling UI resizing
+/// to avoid keyboard overlap.
 class TextInputBuilder extends StatefulWidget {
   const TextInputBuilder({
     Key? key,
@@ -23,11 +28,16 @@ class TextInputBuilder extends StatefulWidget {
   /// Defaults to true.
   final bool resizeToAvoidBottomInset;
 
+  /// The main body widget that is displayed behind the keyboard.
   final Widget body;
 
   /// The default height of the keyboard.
   final double keyboardHeight;
 
+  /// A list of `KeyboardConfiguration`.
+  ///
+  /// This list allows you to manage multiple configurations for different keyboards.
+  /// Each configuration defines a different keyboard behavior and appearance.
   final List<KeyboardConfiguration> configurations;
 
   @override
@@ -42,7 +52,7 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
   void initState() {
     super.initState();
     SystemKeyboard()
-        .afterKeyboardLayoutFinshed
+        .afterSystemKeyboardLayoutFinshed
         .addListener(_afterKeyboardLayoutFinshed);
   }
 
@@ -80,14 +90,17 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
   @override
   void dispose() {
     SystemKeyboard()
-        .afterKeyboardLayoutFinshed
+        .afterSystemKeyboardLayoutFinshed
         .removeListener(_afterKeyboardLayoutFinshed);
+    SystemKeyboard().clearCurrentRouteLastKeyboardHeight(_route!);
     KeyboardBindingMixin.binding.unregister(route: _route!);
     super.dispose();
   }
 
   double? get systemKeyboardHeight {
-    return SystemKeyboard().lastKeyboardHeight;
+    return SystemKeyboard().getCurrentRouteLastKeyboardHeight(
+      ModalRoute.of(context),
+    );
   }
 
   KeyboardConfiguration? preConfiguration;

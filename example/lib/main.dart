@@ -8,7 +8,7 @@ import 'extended_keyboard_example_routes.dart';
 
 Future<void> main() async {
   KeyboardBinding();
-
+  await SystemKeyboard().init();
   runApp(const MyApp());
 }
 
@@ -38,29 +38,6 @@ class MyApp extends StatelessWidget {
           },
         );
       },
-    );
-  }
-}
-
-class CommonWidget extends StatelessWidget {
-  const CommonWidget({
-    this.child,
-    this.title,
-    super.key,
-  });
-  final Widget? child;
-  final String? title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: Text(
-          title!,
-        ),
-      ),
-      body: child,
     );
   }
 }

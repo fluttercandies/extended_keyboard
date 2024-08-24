@@ -37,15 +37,15 @@ dependencies:
   ff_annotation_route_library: ^3.0.0
   html: any
   url_launcher: any
-  extended_image: any
-  extended_text: any
-  extended_text_field: ^10.1.0
+  extended_image: '>=6.2.0 <100.0.0'
+  extended_text: '>=9.1.0 <100.0.0'
+  extended_text_field: '>=10.1.0 <100.0.0'
   extended_keyboard: 
     path: ../
-  collection: ^1.16.0
-  extended_text_library: any
+  collection: any
+  extended_text_library: '>=9.1.0 <100.0.0'
   loading_more_list: any
-  http_client_helper: ^2.0.4
+  http_client_helper: '>2.0.0 <10.0.0'
   loading_more_list_library: ^3.0.0
 dev_dependencies:
   flutter_test:

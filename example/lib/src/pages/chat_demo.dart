@@ -23,7 +23,8 @@ enum KeyboardPanelType {
 @FFRoute(
   name: 'fluttercandies://ChatDemo',
   routeName: 'ChatDemo',
-  description: 'Show how to build chat list quickly',
+  description:
+      'Show how to build chat page which include custom keyboard with KeyboardBuilder quickly',
   exts: <String, dynamic>{
     'order': 0,
     'group': 'Simple',
@@ -62,40 +63,42 @@ class _ChatDemoState extends State<ChatDemo> {
           },
           body: Column(children: <Widget>[
             Expanded(
-              child: ListView.builder(
-                controller: _controller,
-                itemBuilder: (BuildContext context, int index) {
-                  final Message message = _messages[index];
-                  List<Widget> children = <Widget>[
-                    ExtendedImage.asset(
-                      Assets.assets_avatar_jpg,
-                      width: 20,
-                      height: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Flexible(
-                      child: ExtendedText(
-                        message.content,
-                        specialTextSpanBuilder: _mySpecialTextSpanBuilder,
-                        maxLines: 10,
+              child: KeyboardDismisser(
+                child: ListView.builder(
+                  controller: _controller,
+                  itemBuilder: (BuildContext context, int index) {
+                    final Message message = _messages[index];
+                    List<Widget> children = <Widget>[
+                      ExtendedImage.asset(
+                        Assets.assets_avatar_jpg,
+                        width: 20,
+                        height: 20,
                       ),
-                    ),
-                  ];
-                  if (message.isMe) {
-                    children = children.reversed.toList();
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: message.isMe
-                          ? MainAxisAlignment.end
-                          : MainAxisAlignment.start,
-                      children: children,
-                    ),
-                  );
-                },
-                itemCount: _messages.length,
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: ExtendedText(
+                          message.content,
+                          specialTextSpanBuilder: _mySpecialTextSpanBuilder,
+                          maxLines: 10,
+                        ),
+                      ),
+                    ];
+                    if (message.isMe) {
+                      children = children.reversed.toList();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: message.isMe
+                            ? MainAxisAlignment.end
+                            : MainAxisAlignment.start,
+                        children: children,
+                      ),
+                    );
+                  },
+                  itemCount: _messages.length,
+                ),
               ),
             ),
             Container(

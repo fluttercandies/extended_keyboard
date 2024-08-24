@@ -10,6 +10,7 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
 import 'src/main_page.dart';
+import 'src/pages/chat_demo1.dart';
 import 'src/pages/chat_demo.dart';
 import 'src/pages/text_input_demo.dart';
 
@@ -32,6 +33,22 @@ FFRouteSettings getRouteSettings({
           ),
         ),
         routeName: 'ChatDemo',
+        description: 'Show how to build chat list quickly',
+        exts: <String, dynamic>{
+          'order': 0,
+          'group': 'Simple',
+        },
+      );
+    case 'fluttercandies://ChatDemo1':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => ChatDemo1(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+        ),
+        routeName: 'ChatDemo1',
         description: 'Show how to build chat list quickly',
         exts: <String, dynamic>{
           'order': 0,

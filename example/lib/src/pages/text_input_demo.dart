@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
   routeName: 'TextInput',
   description: 'Show how to build custom TextInput quickly',
   exts: <String, dynamic>{
-    'order': 10,
+    'order': 2,
     'group': 'Simple',
   },
 )
@@ -34,7 +34,7 @@ class _TextInputDemoState extends State<TextInputDemo> {
         builder: () {
           return _buildCustomKeyboard(TextInputAction.next, _controller);
         },
-        textInputTypeName: '测试',
+        textInputTypeName: 'custom_number',
         // showDuration: const Duration(seconds: 1),
         // hideDuration: const Duration(seconds: 1),
       ),
@@ -44,20 +44,10 @@ class _TextInputDemoState extends State<TextInputDemo> {
         builder: () {
           return _buildCustomKeyboard(TextInputAction.previous, _controller1);
         },
-        textInputTypeName: '测试1',
+        textInputTypeName: 'custom_number1',
         // resizeToAvoidBottomInset: false,
       ),
     ];
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -78,14 +68,10 @@ class _TextInputDemoState extends State<TextInputDemo> {
       body: SafeArea(
         bottom: true,
         child: TextInputBuilder(
-          body: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            child: Column(
-              children: <Widget>[
-                Expanded(
+          body: Column(
+            children: <Widget>[
+              Expanded(
+                child: KeyboardDismisser(
                   child: ListView.builder(
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
@@ -97,28 +83,29 @@ class _TextInputDemoState extends State<TextInputDemo> {
                     itemCount: 200,
                   ),
                 ),
-                TextField(
-                  keyboardType: _configurations[0].keyboardType,
-                  controller: _controller,
-                  decoration: const InputDecoration(hintText: '测试'),
+              ),
+              TextField(
+                keyboardType: _configurations[0].keyboardType,
+                controller: _controller,
+                decoration: const InputDecoration(
+                  hintText: 'Input something',
                 ),
-                TextField(
-                  keyboardType: _configurations[1].keyboardType,
-                  controller: _controller1,
-                  decoration: const InputDecoration(hintText: '测试1'),
+              ),
+              TextField(
+                keyboardType: _configurations[1].keyboardType,
+                controller: _controller1,
+                decoration: const InputDecoration(
+                  hintText: 'Input something',
                 ),
-                const TextField(
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                ),
-                const TextField(
-                  textInputAction: TextInputAction.next,
-                ),
-                const TextField(
-                  textInputAction: TextInputAction.done,
-                ),
-              ],
-            ),
+              ),
+              const TextField(
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+              ),
+              const TextField(
+                textInputAction: TextInputAction.done,
+              ),
+            ],
           ),
           configurations: _configurations,
         ),

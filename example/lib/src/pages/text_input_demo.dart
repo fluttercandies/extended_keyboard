@@ -5,22 +5,23 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 
 @FFRoute(
-  name: 'fluttercandies://TextInput',
-  routeName: 'TextInput',
-  description: 'Show how to build custom TextInput quickly',
+  name: 'fluttercandies://TextInputScope',
+  routeName: 'TextInputScope',
+  description:
+      'Show how to build different custom keyboard with TextInputScope quickly',
   exts: <String, dynamic>{
-    'order': 2,
+    'order': 1,
     'group': 'Simple',
   },
 )
-class TextInputDemo extends StatefulWidget {
-  const TextInputDemo({Key? key}) : super(key: key);
+class TextInputScopeDemo extends StatefulWidget {
+  const TextInputScopeDemo({Key? key}) : super(key: key);
 
   @override
-  State<TextInputDemo> createState() => _TextInputDemoState();
+  State<TextInputScopeDemo> createState() => _TextInputScopeDemoState();
 }
 
-class _TextInputDemoState extends State<TextInputDemo> {
+class _TextInputScopeDemoState extends State<TextInputScopeDemo> {
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _controller1 = TextEditingController();
   late List<KeyboardConfiguration> _configurations;
@@ -30,7 +31,7 @@ class _TextInputDemoState extends State<TextInputDemo> {
     _configurations = <KeyboardConfiguration>[
       KeyboardConfiguration(
         getKeyboardHeight: (double? systemKeyboardHeight) =>
-            systemKeyboardHeight ?? 200,
+            systemKeyboardHeight ?? 346,
         builder: () {
           return _buildCustomKeyboard(TextInputAction.next, _controller);
         },
@@ -40,7 +41,7 @@ class _TextInputDemoState extends State<TextInputDemo> {
       ),
       KeyboardConfiguration(
         getKeyboardHeight: (double? systemKeyboardHeight) =>
-            systemKeyboardHeight ?? 200,
+            systemKeyboardHeight ?? 346,
         builder: () {
           return _buildCustomKeyboard(TextInputAction.previous, _controller1);
         },
@@ -54,58 +55,71 @@ class _TextInputDemoState extends State<TextInputDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TestPage'),
+        title: const Text('TextInputDemo'),
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(Routes.fluttercandiesTextInput);
+              Navigator.of(context)
+                  .pushNamed(Routes.fluttercandiesTextInputScope);
             },
-            icon: const Icon(Icons.pages),
+            icon: const Icon(Icons.next_plan),
           ),
         ],
       ),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: true,
-        child: TextInputBuilder(
-          body: Column(
-            children: <Widget>[
-              Expanded(
-                child: KeyboardDismisser(
-                  child: ListView.builder(
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text('item $index'),
-                      );
-                    },
-                    itemCount: 200,
+        child: TextInputScope(
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: KeyboardDismisser(
+                    child: ListView.builder(
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text('item $index'),
+                        );
+                      },
+                      itemCount: 200,
+                    ),
                   ),
                 ),
-              ),
-              TextField(
-                keyboardType: _configurations[0].keyboardType,
-                controller: _controller,
-                decoration: const InputDecoration(
-                  hintText: 'Input something',
+                TextField(
+                  keyboardType: _configurations[0].keyboardType,
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    hintText:
+                        'The keyboardType is ${_configurations[0].keyboardType.name}',
+                  ),
                 ),
-              ),
-              TextField(
-                keyboardType: _configurations[1].keyboardType,
-                controller: _controller1,
-                decoration: const InputDecoration(
-                  hintText: 'Input something',
+                TextField(
+                  keyboardType: _configurations[1].keyboardType,
+                  controller: _controller1,
+                  decoration: InputDecoration(
+                    hintText:
+                        'The keyboardType is ${_configurations[1].keyboardType.name}',
+                  ),
                 ),
-              ),
-              const TextField(
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-              ),
-              const TextField(
-                textInputAction: TextInputAction.done,
-              ),
-            ],
+                const TextField(
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    hintText: 'The keyboardType is number',
+                  ),
+                ),
+                const TextField(
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    hintText: 'The keyboardType is text',
+                  ),
+                ),
+              ],
+            ),
           ),
           configurations: _configurations,
         ),
@@ -119,14 +133,28 @@ class _TextInputDemoState extends State<TextInputDemo> {
   ) {
     return Material(
       //shadowColor: Colors.grey,
-      color: const Color.fromARGB(255, 119, 116, 116),
+
       //elevation: 8,
-      child: Padding(
+      child: Container(
         padding: const EdgeInsets.only(
           left: 10,
           right: 10,
           top: 20,
           bottom: 20,
+        ),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: <Color>[Colors.blueAccent, Colors.lightBlueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: IntrinsicHeight(
           child: Row(

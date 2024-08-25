@@ -25,10 +25,9 @@ enum KeyboardPanelType {
 @FFRoute(
   name: 'fluttercandies://ChatDemo1',
   routeName: 'ChatDemo1',
-  description:
-      'Show how to build chat page which include custom keyboard with TextInputBuilder quickly',
+  description: 'Show how to build custom keyboard with TextInputScope quickly',
   exts: <String, dynamic>{
-    'order': 1,
+    'order': 2,
     'group': 'Simple',
   },
 )
@@ -64,7 +63,7 @@ class _ChatDemo1State extends State<ChatDemo1> {
       for (int i = 0; i < KeyboardPanelType.values.length; i++)
         KeyboardConfiguration(
           getKeyboardHeight: (double? systemKeyboardHeight) =>
-              systemKeyboardHeight ?? 200,
+              systemKeyboardHeight ?? 346,
           builder: () {
             return _buildCustomKeyboard(
               KeyboardPanelType.values[i],
@@ -87,10 +86,10 @@ class _ChatDemo1State extends State<ChatDemo1> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(title: const Text('ChatDemo')),
+      appBar: AppBar(title: const Text('ChatDemo(TextInputBuilder)')),
       body: SafeArea(
         bottom: true,
-        child: TextInputBuilder(
+        child: TextInputScope(
           resizeToAvoidBottomInset: true,
           body: Column(children: <Widget>[
             Expanded(
@@ -235,15 +234,26 @@ class _ChatDemo1State extends State<ChatDemo1> {
     switch (_keyboardPanelType) {
       case KeyboardPanelType.number:
         return Material(
-          //shadowColor: Colors.grey,
-          color: const Color.fromARGB(255, 119, 116, 116),
-          //elevation: 8,
-          child: Padding(
+          child: Container(
             padding: const EdgeInsets.only(
               left: 10,
               right: 10,
               top: 20,
               bottom: 20,
+            ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: <Color>[Colors.blueAccent, Colors.lightBlueAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
             child: IntrinsicHeight(
               child: Row(
@@ -389,7 +399,7 @@ class _ChatDemo1State extends State<ChatDemo1> {
                           child: CustomButton(
                             child: const Icon(Icons.backspace),
                             onTap: () {
-                              _textEditingController.delete();
+                              delete();
                             },
                           ),
                         ),
@@ -465,6 +475,20 @@ class _ChatDemo1State extends State<ChatDemo1> {
     SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
       _key.currentState?.bringIntoView(_textEditingController.selection.base);
     });
+  }
+
+  void delete() {
+    final TextSpan oldTextSpan =
+        _mySpecialTextSpanBuilder.build(_textEditingController.text);
+
+    final TextEditingValue value =
+        ExtendedTextLibraryUtils.handleSpecialTextSpanDelete(
+      _textEditingController.deleteText(),
+      _textEditingController.value,
+      oldTextSpan,
+      null,
+    );
+    _textEditingController.value = value;
   }
 
   void sendMessage(String text) {

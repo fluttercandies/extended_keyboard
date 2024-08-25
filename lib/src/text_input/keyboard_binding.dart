@@ -29,9 +29,6 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
   ValueNotifier<KeyboardConfiguration?> showKeyboardNotifier =
       ValueNotifier<KeyboardConfiguration?>(null);
 
-  /// Stores the current keyboard configuration handler.
-  KeyboardConfiguration? keyboardHandler;
-
   /// Registers a route with its corresponding keyboard configurations.
   void register({
     required ModalRoute<Object?> route,
@@ -67,6 +64,13 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
 
   /// Stores the name of the current input type.
   String? get name => _name;
+  KeyboardConfiguration? _keyboardConfiguration;
+
+  /// Stores the current keyboard configuration handler.
+  KeyboardConfiguration? get keyboardConfiguration => _keyboardConfiguration;
+
+  /// Whether the custom keyboard is show
+  bool get show => _keyboardConfiguration != null;
 
   /// Handles incoming messages related to text input from the platform.
   Future<ByteData?> _handleTextInputMsg(
@@ -76,20 +80,20 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
 
       switch (methodCall.method) {
         case 'TextInput.show':
-          if (keyboardHandler != null) {
-            showKeyboardNotifier.value = keyboardHandler;
+          if (keyboardConfiguration != null) {
+            showKeyboardNotifier.value = keyboardConfiguration;
             return codec.encodeSuccessEnvelope(null);
           }
           break;
         case 'TextInput.hide':
-          showKeyboardNotifier.value = keyboardHandler;
+          showKeyboardNotifier.value = keyboardConfiguration;
           break;
         case 'TextInput.clearClient':
           _connectionId = null;
           _name = null;
-          if (keyboardHandler != null) {
-            showKeyboardNotifier.value = keyboardHandler;
-            keyboardHandler = null;
+          if (keyboardConfiguration != null) {
+            showKeyboardNotifier.value = keyboardConfiguration;
+            _keyboardConfiguration = null;
             return codec.encodeSuccessEnvelope(null);
           }
           break;
@@ -103,7 +107,7 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
                   _configurations[route]!;
               for (final KeyboardConfiguration config in configs) {
                 if (_name == config.keyboardType.name) {
-                  keyboardHandler = config;
+                  _keyboardConfiguration = config;
                   _hideSystemKeyBoardIfNeed();
                   return codec.encodeSuccessEnvelope(null);
                 }

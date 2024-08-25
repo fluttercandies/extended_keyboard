@@ -34,7 +34,7 @@ FFRouteSettings getRouteSettings({
         ),
         routeName: 'ChatDemo',
         description:
-            'Show how to build chat page which include custom keyboard with KeyboardBuilder quickly',
+            'Show how to build custom keyboard with KeyboardBuilder quickly',
         exts: <String, dynamic>{
           'order': 0,
           'group': 'Simple',
@@ -51,25 +51,26 @@ FFRouteSettings getRouteSettings({
         ),
         routeName: 'ChatDemo1',
         description:
-            'Show how to build chat page which include custom keyboard with TextInputBuilder quickly',
+            'Show how to build custom keyboard with TextInputScope quickly',
         exts: <String, dynamic>{
-          'order': 1,
+          'order': 2,
           'group': 'Simple',
         },
       );
-    case 'fluttercandies://TextInput':
+    case 'fluttercandies://TextInputScope':
       return FFRouteSettings(
         name: name,
         arguments: arguments,
-        builder: () => TextInputDemo(
+        builder: () => TextInputScopeDemo(
           key: asT<Key?>(
             safeArguments['key'],
           ),
         ),
-        routeName: 'TextInput',
-        description: 'Show how to build custom TextInput quickly',
+        routeName: 'TextInputScope',
+        description:
+            'Show how to build different custom keyboard with TextInputScope quickly',
         exts: <String, dynamic>{
-          'order': 2,
+          'order': 1,
           'group': 'Simple',
         },
       );

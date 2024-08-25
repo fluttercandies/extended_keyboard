@@ -43,14 +43,7 @@ class MainPage extends StatelessWidget {
               minWidth: 0.0,
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: TextButton(
-                child: const Text(
-                  'Github',
-                  style: TextStyle(
-                    decorationStyle: TextDecorationStyle.solid,
-                    decoration: TextDecoration.underline,
-                    color: Colors.white,
-                  ),
-                ),
+                child: const Text('Github'),
                 onPressed: () {
                   launchUrl(Uri.parse(
                       'https://github.com/fluttercandies/extended_keyboard'));

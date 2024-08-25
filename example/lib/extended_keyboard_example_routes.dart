@@ -10,7 +10,7 @@
 const List<String> routeNames = <String>[
   'fluttercandies://ChatDemo',
   'fluttercandies://ChatDemo1',
-  'fluttercandies://TextInput',
+  'fluttercandies://TextInputScope',
   'fluttercandies://demogrouppage',
   'fluttercandies://mainpage',
 ];
@@ -19,13 +19,13 @@ const List<String> routeNames = <String>[
 class Routes {
   const Routes._();
 
-  /// 'Show how to build chat page which include custom keyboard with KeyboardBuilder quickly'
+  /// 'Show how to build custom keyboard with KeyboardBuilder quickly'
   ///
   /// [name] : 'fluttercandies://ChatDemo'
   ///
   /// [routeName] : 'ChatDemo'
   ///
-  /// [description] : 'Show how to build chat page which include custom keyboard with KeyboardBuilder quickly'
+  /// [description] : 'Show how to build custom keyboard with KeyboardBuilder quickly'
   ///
   /// [constructors] :
   ///
@@ -34,35 +34,36 @@ class Routes {
   /// [exts] : {'order': 0, 'group': 'Simple'}
   static const String fluttercandiesChatDemo = 'fluttercandies://ChatDemo';
 
-  /// 'Show how to build chat page which include custom keyboard with TextInputBuilder quickly'
+  /// 'Show how to build custom keyboard with TextInputScope quickly'
   ///
   /// [name] : 'fluttercandies://ChatDemo1'
   ///
   /// [routeName] : 'ChatDemo1'
   ///
-  /// [description] : 'Show how to build chat page which include custom keyboard with TextInputBuilder quickly'
+  /// [description] : 'Show how to build custom keyboard with TextInputScope quickly'
   ///
   /// [constructors] :
   ///
   /// ChatDemo1 : [Key? key]
   ///
-  /// [exts] : {'order': 1, 'group': 'Simple'}
+  /// [exts] : {'order': 2, 'group': 'Simple'}
   static const String fluttercandiesChatDemo1 = 'fluttercandies://ChatDemo1';
 
-  /// 'Show how to build custom TextInput quickly'
+  /// 'Show how to build different custom keyboard with TextInputScope quickly'
   ///
-  /// [name] : 'fluttercandies://TextInput'
+  /// [name] : 'fluttercandies://TextInputScope'
   ///
-  /// [routeName] : 'TextInput'
+  /// [routeName] : 'TextInputScope'
   ///
-  /// [description] : 'Show how to build custom TextInput quickly'
+  /// [description] : 'Show how to build different custom keyboard with TextInputScope quickly'
   ///
   /// [constructors] :
   ///
-  /// TextInputDemo : [Key? key]
+  /// TextInputScopeDemo : [Key? key]
   ///
-  /// [exts] : {'order': 2, 'group': 'Simple'}
-  static const String fluttercandiesTextInput = 'fluttercandies://TextInput';
+  /// [exts] : {'order': 1, 'group': 'Simple'}
+  static const String fluttercandiesTextInputScope =
+      'fluttercandies://TextInputScope';
 
   /// 'DemoGroupPage'
   ///

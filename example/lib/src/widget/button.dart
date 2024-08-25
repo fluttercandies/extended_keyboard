@@ -19,8 +19,15 @@ class NumberButton extends StatelessWidget {
         margin: const EdgeInsets.all(5),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: Text(
           '$number',
@@ -46,8 +53,15 @@ class CustomButton extends StatelessWidget {
         margin: const EdgeInsets.all(5),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         child: child,
       ),

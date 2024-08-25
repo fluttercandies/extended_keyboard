@@ -23,8 +23,7 @@ enum KeyboardPanelType {
 @FFRoute(
   name: 'fluttercandies://ChatDemo',
   routeName: 'ChatDemo',
-  description:
-      'Show how to build chat page which include custom keyboard with KeyboardBuilder quickly',
+  description: 'Show how to build custom keyboard with KeyboardBuilder quickly',
   exts: <String, dynamic>{
     'order': 0,
     'group': 'Simple',
@@ -53,7 +52,7 @@ class _ChatDemoState extends State<ChatDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(title: const Text('ChatDemo')),
+      appBar: AppBar(title: const Text('ChatDemo(KeyboardBuilder)')),
       body: SafeArea(
         bottom: true,
         child: KeyboardBuilder(
@@ -196,7 +195,7 @@ class _ChatDemoState extends State<ChatDemo> {
     BuildContext context,
     double? keyboardHeight,
   ) {
-    keyboardHeight ??= 300;
+    keyboardHeight ??= 346;
 
     switch (_keyboardPanelType) {
       case KeyboardPanelType.emoji:

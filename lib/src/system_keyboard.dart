@@ -44,7 +44,7 @@ class SystemKeyboard with WidgetsBindingObserver {
     if (currentHeight != 0) {
       _systemKeyboard.updateHeight(currentHeight);
     }
-    SystemKeyboard().afterSystemKeyboardLayoutFinshed.value = currentHeight;
+    _systemKeyboard.afterSystemKeyboardLayoutFinshed.value = currentHeight;
   }.debounce(const Duration(milliseconds: 100));
 
   /// Gets the last known app-wide keyboard height.

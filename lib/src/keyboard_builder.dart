@@ -34,15 +34,15 @@ class KeyboardBuilder extends StatefulWidget {
   /// A builder function that returns a widget based on the keyboard height.
   final KeyboardBuilderCallback builder;
 
-  /// The main body widget that is displayed behind the keyboard.
+  /// The main body widget.
   final Widget body;
 
-  /// If true the [body] and the scaffold's floating widgets should size
+  /// If true the [body] and the [KeyboardBuilder]'s floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
   /// ambient [MediaQuery]'s [MediaQueryData.viewInsets] `bottom` property.
   ///
   /// For example, if there is an onscreen keyboard displayed above the
-  /// scaffold, the body can be resized to avoid overlapping the keyboard, which
+  /// [KeyboardBuilder], the body can be resized to avoid overlapping the keyboard, which
   /// prevents widgets inside the body from being obscured by the keyboard.
   ///
   /// Defaults to true.

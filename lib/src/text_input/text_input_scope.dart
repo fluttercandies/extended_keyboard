@@ -5,30 +5,30 @@ import 'package:flutter/material.dart';
 
 /// A stateful widget that builds a customizable text input UI.
 ///
-/// `TextInputBuilder` is designed to provide a custom text input experience
+/// [TextInputScope] is designed to provide a custom text input experience
 /// by managing different keyboard configurations and handling UI resizing
 /// to avoid keyboard overlap.
-class TextInputBuilder extends StatefulWidget {
-  const TextInputBuilder({
+class TextInputScope extends StatefulWidget {
+  const TextInputScope({
     Key? key,
     this.resizeToAvoidBottomInset = true,
     required this.body,
-    this.keyboardHeight = 200,
+    this.keyboardHeight = 346,
     required this.configurations,
   }) : super(key: key);
 
-  /// If true the [body] and the scaffold's floating widgets should size
+  /// If true the [body] and the [TextInputScope]'s floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
   /// ambient [MediaQuery]'s [MediaQueryData.viewInsets] `bottom` property.
   ///
   /// For example, if there is an onscreen keyboard displayed above the
-  /// scaffold, the body can be resized to avoid overlapping the keyboard, which
+  /// [TextInputScope], the body can be resized to avoid overlapping the keyboard, which
   /// prevents widgets inside the body from being obscured by the keyboard.
   ///
   /// Defaults to true.
   final bool resizeToAvoidBottomInset;
 
-  /// The main body widget that is displayed behind the keyboard.
+  /// The main body widget.
   final Widget body;
 
   /// The default height of the keyboard.
@@ -41,10 +41,10 @@ class TextInputBuilder extends StatefulWidget {
   final List<KeyboardConfiguration> configurations;
 
   @override
-  State<TextInputBuilder> createState() => _TextInputBuilderState();
+  State<TextInputScope> createState() => _TextInputScopeState();
 }
 
-class _TextInputBuilderState extends State<TextInputBuilder> {
+class _TextInputScopeState extends State<TextInputScope> {
   ModalRoute<Object?>? _route;
   double _currentKeyboardHeight = 0;
   double _preSystemKeyboardHeight = 0;
@@ -76,7 +76,7 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
   }
 
   @override
-  void didUpdateWidget(covariant TextInputBuilder oldWidget) {
+  void didUpdateWidget(covariant TextInputScope oldWidget) {
     if (oldWidget.configurations != widget.configurations) {
       KeyboardBindingMixin.binding.unregister(route: _route!);
       KeyboardBindingMixin.binding.register(
@@ -113,7 +113,7 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
         KeyboardConfiguration? configuration,
         Widget? child,
       ) {
-        final bool show = KeyboardBindingMixin.binding.keyboardHandler != null;
+        final bool show = KeyboardBindingMixin.binding.show;
 
         final KeyboardConfiguration? keyboardHandler =
             configuration ?? preConfiguration;
@@ -154,8 +154,9 @@ class _TextInputBuilderState extends State<TextInputBuilder> {
                 SystemKeyboard().getSystemKeyboardHeightByName() ??
                     customKeyboardHeight + viewPaddingBottom;
           }
-        } else if (currentSystemKeyboardHeight < _preSystemKeyboardHeight) {
-        } else {}
+        }
+        // else if (currentSystemKeyboardHeight < _preSystemKeyboardHeight) {
+        // } else {}
         _preSystemKeyboardHeight = currentSystemKeyboardHeight;
 
         return Stack(

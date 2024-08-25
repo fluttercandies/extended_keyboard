@@ -6,8 +6,8 @@ issue_tracker: https://github.com/fluttercandies/extended_keyboard/issues
 topics:
   - keyboard
   - custom-keyboard
-  - textInput
-  - custom-textInput
+  - text-input
+  - custom-text-input
 
 environment:
   sdk: ">=2.17.6 <4.0.0"

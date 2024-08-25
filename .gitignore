@@ -29,3 +29,5 @@ migrate_working_dir/
 .packages
 build/
 .metadata
+.flutter-plugins
+.flutter-plugins-dependencies

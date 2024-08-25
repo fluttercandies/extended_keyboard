@@ -1,8 +1,9 @@
 import 'package:extended_keyboard/extended_keyboard.dart';
-import 'package:extended_keyboard_example/extended_keyboard_example_routes.dart';
 import 'package:extended_keyboard_example/src/widget/button.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
+
+import '../../extended_keyboard_example_routes.dart';
 
 @FFRoute(
   name: 'fluttercandies://TextInputScope',
@@ -132,9 +133,6 @@ class _TextInputScopeDemoState extends State<TextInputScopeDemo> {
     TextEditingController controller,
   ) {
     return Material(
-      //shadowColor: Colors.grey,
-
-      //elevation: 8,
       child: Container(
         padding: const EdgeInsets.only(
           left: 10,

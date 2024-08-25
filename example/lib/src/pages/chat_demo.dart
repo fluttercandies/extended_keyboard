@@ -57,8 +57,8 @@ class _ChatDemoState extends State<ChatDemo> {
         bottom: true,
         child: KeyboardBuilder(
           resizeToAvoidBottomInset: true,
-          builder: (BuildContext context, double? keyboardHeight) {
-            return _buildCustomKeyboard(context, keyboardHeight);
+          builder: (BuildContext context, double? systemKeyboardHeight) {
+            return _buildCustomKeyboard(context, systemKeyboardHeight);
           },
           body: Column(children: <Widget>[
             Expanded(
@@ -193,15 +193,15 @@ class _ChatDemoState extends State<ChatDemo> {
 
   Widget _buildCustomKeyboard(
     BuildContext context,
-    double? keyboardHeight,
+    double? systemKeyboardHeight,
   ) {
-    keyboardHeight ??= 346;
+    systemKeyboardHeight ??= 346;
 
     switch (_keyboardPanelType) {
       case KeyboardPanelType.emoji:
         return Material(
           child: SizedBox(
-            height: keyboardHeight,
+            height: systemKeyboardHeight,
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 8,
@@ -225,7 +225,7 @@ class _ChatDemoState extends State<ChatDemo> {
       case KeyboardPanelType.image:
         return Material(
           child: SizedBox(
-            height: keyboardHeight,
+            height: systemKeyboardHeight,
             child: LoadingMoreList<TuChongItem>(
               ListConfig<TuChongItem>(
                 sourceList: imageList,

@@ -11,11 +11,23 @@ import 'package:flutter/material.dart';
 class TextInputScope extends StatefulWidget {
   const TextInputScope({
     Key? key,
-    this.resizeToAvoidBottomInset = true,
     required this.body,
-    this.keyboardHeight = 346,
     required this.configurations,
+    this.keyboardHeight = 346,
+    this.resizeToAvoidBottomInset = true,
   }) : super(key: key);
+
+  /// The main body widget.
+  final Widget body;
+
+  /// A list of `KeyboardConfiguration`.
+  ///
+  /// This list allows you to manage multiple configurations for different keyboards.
+  /// Each configuration defines a different keyboard behavior and appearance.
+  final List<KeyboardConfiguration> configurations;
+
+  /// The default height of the keyboard.
+  final double keyboardHeight;
 
   /// If true the [body] and the [TextInputScope]'s floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
@@ -27,18 +39,6 @@ class TextInputScope extends StatefulWidget {
   ///
   /// Defaults to true.
   final bool resizeToAvoidBottomInset;
-
-  /// The main body widget.
-  final Widget body;
-
-  /// The default height of the keyboard.
-  final double keyboardHeight;
-
-  /// A list of `KeyboardConfiguration`.
-  ///
-  /// This list allows you to manage multiple configurations for different keyboards.
-  /// Each configuration defines a different keyboard behavior and appearance.
-  final List<KeyboardConfiguration> configurations;
 
   @override
   State<TextInputScope> createState() => _TextInputScopeState();

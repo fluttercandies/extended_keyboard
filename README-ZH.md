@@ -2,13 +2,13 @@
 
 [![pub package](https://img.shields.io/pub/v/extended_keyboard.svg)](https://pub.dartlang.org/packages/extended_keyboard) [![GitHub stars](https://img.shields.io/github/stars/fluttercandies/extended_keyboard)](https://github.com/fluttercandies/extended_keyboard/stargazers) [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/extended_keyboard)](https://github.com/fluttercandies/extended_keyboard/network) [![GitHub license](https://img.shields.io/github/license/fluttercandies/extended_keyboard)](https://github.com/fluttercandies/extended_keyboard/blob/master/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/fluttercandies/extended_keyboard)](https://github.com/fluttercandies/extended_keyboard/issues) <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="flutter-candies" title="flutter-candies"></a>
 
-Language: English| [中文简体](README-ZH.md)
+Language: [English](README.md) | 中文简体
 
-Flutter plugin for create custom keyboards quickly.
+用于快速创建自定义键盘的插件。
 
 - [extended\_keyboard](#extended_keyboard)
-  - [Install](#install)
-  - [Use](#use)
+  - [安装](#安装)
+  - [使用](#使用)
     - [SystemKeyboard](#systemkeyboard)
     - [KeyboardBuilder](#keyboardbuilder)
       - [KeyboardTypeBuilder](#keyboardtypebuilder)
@@ -20,20 +20,20 @@ Flutter plugin for create custom keyboards quickly.
       - [TextInputScope](#textinputscope-1)
 
 
-## Install
+## 安装
 
-Run flutter pub add `extended_keyboard`, or add `extended_keyboard` to pubspec.yaml dependencies manually.
+运行 flutter pub add `extended_keyboard`, 或者直接手动添加 `extended_keyboard` 到 pubspec.yaml 中的 dependencies.
 
 ``` yaml
 dependencies:
   extended_keyboard: ^latest_version
 ```
 
-## Use
+## 使用
 
 ### SystemKeyboard
 
-A singleton class that manages system keyboard height and provides functionality to handle keyboard layout changes.
+用于管理系统键盘的高度并提供处理键盘布局更改的功能。
 
 ``` yaml
 Future<void> main() async {
@@ -46,7 +46,7 @@ Future<void> main() async {
 
 #### KeyboardTypeBuilder
 
-A widget that listens to changes in the `CustomKeyboardController` and builds a widget accordingly.
+用于监听 `KeyboardType` 改变的组件，并且提供 `CustomKeyboardController` 来控制自定义键盘的开关。
 
 ``` dart
    KeyboardTypeBuilder(
@@ -75,7 +75,7 @@ A widget that listens to changes in the `CustomKeyboardController` and builds a 
 
 #### CustomKeyboardController
 
-A controller for managing the keyboard type and notifying listeners.
+用于通知 `KeyboardType` 改变，并且控制自定义键盘的开关。
 
 * `KeyboardType` : The current keyboard type
 * `isCustom` :  whether current keyboard is custom
@@ -84,15 +84,15 @@ A controller for managing the keyboard type and notifying listeners.
 
 #### KeyboardBuilder
 
-if `Scaffold` is used, make sure set `Scaffold.resizeToAvoidBottomInset` to false.
+如果使用 `Scaffold`，请确保将 `Scaffold.resizeToAvoidBottomInset` 设置为 `false`。
 
-Using the `KeyboardBuilder` widget to encapsulate the area containing the input field allows for the creation of a custom keyboard layout within its `builder` callback. The `builder` function receives a parameter named `systemKeyboardHeight`, which represents the height of the last system keyboard displayed. This parameter can be utilized to set an appropriate height for your custom keyboard, ensuring a seamless and intuitive user experience.
+使用 `KeyboardBuilder` 小部件来封装包含输入字段的区域，允许在其 `builder` 回调中创建自定义键盘布局。`builder` 函数接收一个名为 `systemKeyboardHeight` 的参数，该参数表示最后显示的系统键盘的高度。此参数可用于为您的自定义键盘设置适当的高度，从而确保无缝且直观的用户体验。
 
-| parameter                | description                                                                   | default  |
-| ------------------------ | ----------------------------------------------------------------------------- | -------- |
-| builder                  | A builder function that returns a widget based on the system keyboard height. | required |
-| body                     | The main body widget.                                                         | required |
-| resizeToAvoidBottomInset | The same as `Scaffold.resizeToAvoidBottomInset`.                              | true     |
+| parameter                | description                                        | default  |
+| ------------------------ | -------------------------------------------------- | -------- |
+| builder                  | 一个构建器函数，它根据系统键盘高度返回一个小部件。 | required |
+| body                     | 包含输入框的组件部分                               | required |
+| resizeToAvoidBottomInset | 跟 `Scaffold.resizeToAvoidBottomInset` 作用一致    | true     |
  
 
 
@@ -151,7 +151,7 @@ Using the `KeyboardBuilder` widget to encapsulate the area containing the input 
 
 #### KeyboardBinding / KeyboardBindingMixin
 
-You can directly use `KeyboardBinding` or mix the `KeyboardBindingMixin` into your `WidgetsFlutterBinding`.
+你可以直接使用 `KeyboardBinding` ，或者将 `KeyboardBindingMixin` 混入到你的 `WidgetsFlutterBinding` 中。
 
 ``` yaml
 Future<void> main() async {
@@ -163,17 +163,16 @@ Future<void> main() async {
 
 #### KeyboardConfiguration
 
-This configuration includes how the keyboard should be built,
-its animation durations, and how it should behave with respect to resizing.
+这个配置包括键盘应该如何构建，它的动画持续时间，它的名字。
 
-| parameter                | description                                                                                                            | default                           |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| getKeyboardHeight        | Function that calculates the height of the custom keyboard.                                                            | required                          |
-| builder                  | The main body widget.                                                                                                  | required                          |
-| keyboardName             | The name of the keyboard                                                                                               | required                          |
-| showDuration             | Duration for the keyboard's show animation.                                                                            | const Duration(milliseconds: 200) |
-| hideDuration             | Duration for the keyboard's hide animation.                                                                            | const Duration(milliseconds: 200) |
-| resizeToAvoidBottomInset | The same as `Scaffold.resizeToAvoidBottomInset`. if it's null, it's equal to `TextInputScope.resizeToAvoidBottomInset` | null                              |
+| parameter                | description                                                                                                              | default                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------- |
+| getKeyboardHeight        | 返回自定义键盘的高度                                                                                                     | required                          |
+| builder                  | 包含输入框的主体                                                                                                         | required                          |
+| keyboardName             | 自定义键盘的名字                                                                                                         | required                          |
+| showDuration             | 自定义键盘打开的时间                                                                                                     | const Duration(milliseconds: 200) |
+| hideDuration             | 自定义键盘隐藏的时间                                                                                                     | const Duration(milliseconds: 200) |
+| resizeToAvoidBottomInset | 跟 `Scaffold.resizeToAvoidBottomInset` 一样的意思. 如果它不设置，将和 `TextInputScope.resizeToAvoidBottomInset` 的值相同 | null                              |
 
 ``` dart
   KeyboardConfiguration(
@@ -190,14 +189,14 @@ its animation durations, and how it should behave with respect to resizing.
 
 #### TextInputScope
 
-if `Scaffold` is used, make sure set `Scaffold.resizeToAvoidBottomInset` to false.
+如果使用 `Scaffold`，请确保将 `Scaffold.resizeToAvoidBottomInset` 设置为 `false`。
 
-| parameter                | description                                      | default  |
-| ------------------------ | ------------------------------------------------ | -------- |
-| body                     | The main body widget.                            | required |
-| configurations           | A list of `KeyboardConfiguration`                | required |
-| keyboardHeight           | The default height of the keyboard.              | 346      |
-| resizeToAvoidBottomInset | The same as `Scaffold.resizeToAvoidBottomInset`. | true     |
+| parameter                | description                                        | default  |
+| ------------------------ | -------------------------------------------------- | -------- |
+| body                     | 包含输入框的主体                                   | required |
+| configurations           | 自定义键盘配置                                     | required |
+| keyboardHeight           | 默认的自定义键盘高度                               | 346      |
+| resizeToAvoidBottomInset | 跟 `Scaffold.resizeToAvoidBottomInset` 的意思一样. | true     |
 
 ``` dart
   late List<KeyboardConfiguration> _configurations;
@@ -255,6 +254,5 @@ if `Scaffold` is used, make sure set `Scaffold.resizeToAvoidBottomInset` to fals
 ![img](https://github.com/fluttercandies/flutter_candies/blob/master/gif/extended_keyboard/chat_demo1.gif)
 
 [Full Demo](https://github.com/fluttercandies/extended_keyboard/blob/main/example/lib/src/pages/chat_demo1.dart)
-
 
  

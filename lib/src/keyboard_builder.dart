@@ -19,7 +19,7 @@ enum KeyboardType {
 /// A builder function that returns a widget based on the keyboard height.
 typedef KeyboardBuilderCallback = Widget Function(
   BuildContext context,
-  double? keyboardHeight,
+  double? systemKeyboardHeight,
 );
 
 /// A widget that builds a custom keyboard based on the provided builder function.
@@ -31,7 +31,7 @@ class KeyboardBuilder extends StatefulWidget {
     this.resizeToAvoidBottomInset = true,
   }) : super(key: key);
 
-  /// A builder function that returns a widget based on the keyboard height.
+  /// A builder function that returns a widget based on the system keyboard height.
   final KeyboardBuilderCallback builder;
 
   /// The main body widget.
@@ -236,11 +236,8 @@ class CustomKeyboardController extends ChangeNotifier
   /// Creates a [ChangeNotifier] that wraps this value.
   CustomKeyboardController(this._value);
 
-  /// The current value stored in this notifier.
-  ///
-  /// When the value is replaced with something that is not equal to the old
-  /// value as evaluated by the equality operator ==, this class notifies its
-  /// listeners.
+  /// The current keyboard type.
+
   @override
   KeyboardType get value => _value;
   KeyboardType _value;
@@ -265,12 +262,15 @@ class CustomKeyboardController extends ChangeNotifier
     notifyListeners();
   }
 
+  /// whether current keyboard is custom
   bool get isCustom => _value == KeyboardType.custom;
 
+  /// hide the custom keyboard
   void hideKeyboard() {
     _setValue(KeyboardType.system);
   }
 
+  /// show the custom keyboard
   void showKeyboard() {
     final KeyboardType old = _value;
     _updateValue(KeyboardType.custom);

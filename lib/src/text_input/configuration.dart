@@ -7,21 +7,22 @@ import 'text_input_type.dart';
 class KeyboardConfiguration {
   /// Constructor for `KeyboardConfiguration`.
   ///
-  /// - [builder]: A function that returns a widget, used to build the custom keyboard.
   /// - [getKeyboardHeight]: A function that calculates the height of the keyboard.
+  /// - [builder]: A function that returns a widget, used to build the custom keyboard.
+  /// - [keyboardName]: The name of the keyboard, used to initialize `ExtendedTextInputType` with a unique identifier.
   /// - [showDuration]: Duration for the show animation of the keyboard (default is 200ms).
   /// - [hideDuration]: Duration for the hide animation of the keyboard (default is 200ms).
   /// - [resizeToAvoidBottomInset]: Determines whether the UI should resize to avoid the keyboard.
-  /// - [keyboardName]: The name of the keyboard, used to initialize `ExtendedTextInputType` with a unique identifier.
+
   KeyboardConfiguration({
     required this.builder, // A function to build the keyboard widget.
     required this.getKeyboardHeight, // A function to determine keyboard height.
+    required String keyboardName, // The name of the custom keyboard.
     this.showDuration =
         const Duration(milliseconds: 200), // Duration for showing the keyboard.
     this.hideDuration =
         const Duration(milliseconds: 200), // Duration for hiding the keyboard.
     this.resizeToAvoidBottomInset, // Option to resize UI to avoid keyboard overlapping.
-    required String keyboardName, // The name of the custom keyboard.
   }) : keyboardType = ExtendedTextInputType(
           // Initializes `keyboardType` with a unique name by appending a timestamp.
           name: '$keyboardName---${DateTime.now().millisecondsSinceEpoch}',
@@ -34,6 +35,9 @@ class KeyboardConfiguration {
   /// Builder function that returns the widget representing the custom keyboard.
   final Widget Function() builder;
 
+  /// The type of the keyboard, represented as an `ExtendedTextInputType` with a unique name.
+  final ExtendedTextInputType keyboardType;
+
   /// Duration for the keyboard's show animation.
   final Duration showDuration;
 
@@ -43,7 +47,4 @@ class KeyboardConfiguration {
   /// A boolean that determines if the UI should resize to avoid the keyboard.
   /// If true, the UI will adjust to prevent overlap with the keyboard.
   final bool? resizeToAvoidBottomInset;
-
-  /// The type of the keyboard, represented as an `ExtendedTextInputType` with a unique name.
-  final ExtendedTextInputType keyboardType;
 }

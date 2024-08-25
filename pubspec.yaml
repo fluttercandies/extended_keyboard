@@ -1,7 +1,13 @@
 name: extended_keyboard
-description: A new Flutter package project.
+description: Flutter plugin for create custom keyboards quickly.
 version: 0.0.1
-homepage:
+repository: https://github.com/fluttercandies/extended_keyboard
+issue_tracker: https://github.com/fluttercandies/extended_keyboard/issues
+topics:
+  - keyboard
+  - custom-keyboard
+  - textInput
+  - custom-textInput
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
@@ -16,7 +22,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: '>=2.0.0 <10.0.0'
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

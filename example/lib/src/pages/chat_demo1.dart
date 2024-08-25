@@ -9,6 +9,7 @@ import 'package:extended_text_field/extended_text_field.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:loading_more_list/loading_more_list.dart';
 import '../data/tu_chong_repository.dart';
 import '../data/tu_chong_source.dart';
@@ -481,8 +482,7 @@ class _ChatDemo1State extends State<ChatDemo1> {
     final TextSpan oldTextSpan =
         _mySpecialTextSpanBuilder.build(_textEditingController.text);
 
-    final TextEditingValue value =
-        ExtendedTextLibraryUtils.handleSpecialTextSpanDelete(
+    final TextEditingValue value = handleSpecialTextSpanDelete(
       _textEditingController.deleteText(),
       _textEditingController.value,
       oldTextSpan,
@@ -536,4 +536,54 @@ class Message {
   }) : isMe = Random().nextBool();
   final bool isMe;
   final String content;
+}
+
+TextEditingValue handleSpecialTextSpanDelete(
+    TextEditingValue value,
+    TextEditingValue? oldValue,
+    InlineSpan oldTextSpan,
+    TextInputConnection? textInputConnection) {
+  final String? oldText = oldValue?.text;
+  String newText = value.text;
+
+  /// take care of image span
+  if (oldText != null && oldText.length > newText.length) {
+    final int difStart = value.selection.extentOffset;
+    //int difEnd = oldText.length - 1;
+    // for (; difStart < newText.length; difStart++) {
+    //   if (oldText[difStart] != newText[difStart]) {
+    //     break;
+    //   }
+    // }
+
+    int caretOffset = value.selection.extentOffset;
+    if (difStart > 0) {
+      oldTextSpan.visitChildren((InlineSpan span) {
+        if (span is SpecialInlineSpanBase &&
+            (span as SpecialInlineSpanBase).deleteAll) {
+          final SpecialInlineSpanBase specialTs = span as SpecialInlineSpanBase;
+          if (difStart > specialTs.start && difStart < specialTs.end) {
+            //difStart = ts.start;
+            newText = newText.replaceRange(specialTs.start, difStart, '');
+            caretOffset -= difStart - specialTs.start;
+            return false;
+          }
+        }
+        return true;
+      });
+
+      if (newText != value.text) {
+        value = TextEditingValue(
+            text: newText,
+            selection: value.selection.copyWith(
+                baseOffset: caretOffset,
+                extentOffset: caretOffset,
+                affinity: value.selection.affinity,
+                isDirectional: value.selection.isDirectional));
+        textInputConnection?.setEditingState(value);
+      }
+    }
+  }
+
+  return value;
 }

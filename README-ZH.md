@@ -72,11 +72,17 @@ TextField(
        ),
        activeChanged: (bool active) {
          _keyboardPanelType = KeyboardPanelType.emoji;
-          if (active) {
-            controller.showCustomKeyboard();
-          } else {
-            controller.hideCustomKeyboard();
-          }
+         if (active) {
+           controller.showCustomKeyboard();
+           if (!_focusNode.hasFocus) {
+             SchedulerBinding.instance
+                 .addPostFrameCallback((Duration timeStamp) {
+               _focusNode.requestFocus();
+             });
+           }
+         } else {
+           controller.showSystemKeyboard();
+         }
        },
        active: controller.isCustom &&
            _keyboardPanelType == KeyboardPanelType.emoji,
@@ -146,8 +152,14 @@ TextField(
                     _keyboardPanelType = KeyboardPanelType.emoji;
                     if (active) {
                       controller.showCustomKeyboard();
+                      if (!_focusNode.hasFocus) {
+                        SchedulerBinding.instance
+                            .addPostFrameCallback((Duration timeStamp) {
+                          _focusNode.requestFocus();
+                        });
+                      }
                     } else {
-                      controller.hideCustomKeyboard();
+                      controller.showSystemKeyboard();
                     }
                   },
                   active: controller.isCustom &&

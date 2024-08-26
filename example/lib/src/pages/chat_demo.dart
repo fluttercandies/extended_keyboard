@@ -50,6 +50,8 @@ class _ChatDemoState extends State<ChatDemo> {
 
   final CustomKeyboardController _customKeyboardController =
       CustomKeyboardController(KeyboardType.system);
+
+  final FocusNode _focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +129,7 @@ class _ChatDemoState extends State<ChatDemo> {
                         key: _key,
                         readOnly: readOnly,
                         showCursor: true,
+                        focusNode: _focusNode,
                         specialTextSpanBuilder: _mySpecialTextSpanBuilder,
                         controller: _textEditingController,
                         textInputAction: TextInputAction.done,
@@ -197,8 +200,14 @@ class _ChatDemoState extends State<ChatDemo> {
         _keyboardPanelType = keyboardPanelType;
         if (active) {
           controller.showCustomKeyboard();
+          if (!_focusNode.hasFocus) {
+            SchedulerBinding.instance
+                .addPostFrameCallback((Duration timeStamp) {
+              _focusNode.requestFocus();
+            });
+          }
         } else {
-          controller.hideCustomKeyboard();
+          controller.showSystemKeyboard();
         }
       },
       active: controller.isCustom && _keyboardPanelType == keyboardPanelType,

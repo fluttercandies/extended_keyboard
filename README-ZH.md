@@ -44,6 +44,17 @@ Future<void> main() async {
 ```
 ### KeyboardBuilder
 
+如果我们想要关闭系统键盘，并且保持输入框的不丢失焦点，我们没法再使用 `SystemChannels.textInput.invokeMethod<void>('TextInput.hide')` 了. 相关问题 https://github.com/flutter/flutter/issues/16863
+
+下面的代码是一种变通方案
+
+``` dart
+TextField(
+  showCursor: true,
+  readOnly: true,
+)
+```
+
 #### KeyboardTypeBuilder
 
 用于监听 `KeyboardType` 改变的组件，并且提供 `CustomKeyboardController` 来控制自定义键盘的开关。
@@ -65,6 +76,11 @@ Future<void> main() async {
            controller.showKeyboard();
          } else {
            controller.hideKeyboard();
+         }
+         if (!_readOnly) {
+            setState(() {
+              _readOnly = true;
+            });
          }
        },
        active: controller.isCustom &&
@@ -93,7 +109,7 @@ Future<void> main() async {
 | builder                  | 一个构建器函数，它根据系统键盘高度返回一个小部件。 | required |
 | body                     | 包含输入框的组件部分                               | required |
 | resizeToAvoidBottomInset | 跟 `Scaffold.resizeToAvoidBottomInset` 作用一致    | true     |
- 
+| controller               | 自定义键盘控制器                                   | null     |
 
 
 ``` dart
@@ -111,7 +127,17 @@ Future<void> main() async {
           Row(
             children: <Widget>[
               Expanded(
-                child: TextField(),
+                child: TextField(
+                  readOnly: _readOnly, 
+                  showCursor: true,
+                  onTap: () {
+                    if (_readOnly) {
+                      setState(() {
+                        _readOnly = false;
+                      });
+                    }
+                  },
+                ),
               ),
               KeyboardTypeBuilder(
                 builder: (
@@ -129,6 +155,11 @@ Future<void> main() async {
                       controller.showKeyboard();
                     } else {
                       controller.hideKeyboard();
+                    }
+                    if (!_readOnly) {
+                      setState(() {
+                        _readOnly = true;
+                      });
                     }
                   },
                   active: controller.isCustom &&

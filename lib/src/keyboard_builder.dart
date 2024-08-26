@@ -29,6 +29,7 @@ class KeyboardBuilder extends StatefulWidget {
     required this.body,
     required this.builder,
     this.resizeToAvoidBottomInset = true,
+    this.controller,
   }) : super(key: key);
 
   /// A builder function that returns a widget based on the system keyboard height.
@@ -48,6 +49,9 @@ class KeyboardBuilder extends StatefulWidget {
   /// Defaults to true.
   final bool resizeToAvoidBottomInset;
 
+  /// The controller for the custom keyboard.
+  final CustomKeyboardController? controller;
+
   @override
   State<KeyboardBuilder> createState() => _KeyboardBuilderState();
 }
@@ -57,13 +61,25 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
   double _preKeyboardHeight = 0;
   ModalRoute<Object?>? _route;
   void Function()? _doJob;
-  final CustomKeyboardController _controller =
-      CustomKeyboardController(KeyboardType.system);
+  late CustomKeyboardController _controller;
+
+  CustomKeyboardController get controller => _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller =
+        widget.controller ?? CustomKeyboardController(KeyboardType.system);
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didUpdateWidget(covariant KeyboardBuilder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      _controller =
+          widget.controller ?? CustomKeyboardController(KeyboardType.system);
+    }
   }
 
   @override
@@ -272,11 +288,11 @@ class CustomKeyboardController extends ChangeNotifier
 
   /// show the custom keyboard
   void showKeyboard() {
-    final KeyboardType old = _value;
+    // final KeyboardType old = _value;
     _updateValue(KeyboardType.custom);
-    if (old == KeyboardType.system) {
-      SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
-    }
+    // if (old == KeyboardType.system) {
+    // SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
+    // }
   }
 
   @override

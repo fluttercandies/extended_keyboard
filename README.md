@@ -44,6 +44,17 @@ Future<void> main() async {
 ```
 ### KeyboardBuilder
 
+if we want to close the keyboard without losing textfield focus, we can't use `SystemChannels.textInput.invokeMethod<void>('TextInput.hide')` any more. related issue https://github.com/flutter/flutter/issues/16863
+
+Following code is a workaround.
+
+``` dart
+TextField(
+  showCursor: true,
+  readOnly: true,
+)
+```
+
 #### KeyboardTypeBuilder
 
 A widget that listens to changes in the `CustomKeyboardController` and builds a widget accordingly.
@@ -65,6 +76,11 @@ A widget that listens to changes in the `CustomKeyboardController` and builds a 
            controller.showKeyboard();
          } else {
            controller.hideKeyboard();
+         }
+         if (!_readOnly) {
+           setState(() {
+             _readOnly = true;
+           });
          }
        },
        active: controller.isCustom &&
@@ -93,7 +109,7 @@ Using the `KeyboardBuilder` widget to encapsulate the area containing the input 
 | builder                  | A builder function that returns a widget based on the system keyboard height. | required |
 | body                     | The main body widget.                                                         | required |
 | resizeToAvoidBottomInset | The same as `Scaffold.resizeToAvoidBottomInset`.                              | true     |
- 
+| controller               | The controller for the custom keyboard.                                       | null     |
 
 
 ``` dart
@@ -111,7 +127,17 @@ Using the `KeyboardBuilder` widget to encapsulate the area containing the input 
           Row(
             children: <Widget>[
               Expanded(
-                child: TextField(),
+                child: TextField(
+                  readOnly: _readOnly, 
+                  showCursor: true,
+                  onTap: () {
+                    if (_readOnly) {
+                      setState(() {
+                        _readOnly = false;
+                      });
+                    }
+                  },
+                ),
               ),
               KeyboardTypeBuilder(
                 builder: (
@@ -129,6 +155,11 @@ Using the `KeyboardBuilder` widget to encapsulate the area containing the input 
                       controller.showKeyboard();
                     } else {
                       controller.hideKeyboard();
+                    }
+                    if (!_readOnly) {
+                      setState(() {
+                        _readOnly = true;
+                      });
                     }
                   },
                   active: controller.isCustom &&

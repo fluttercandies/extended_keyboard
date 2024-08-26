@@ -1,6 +1,6 @@
 name: extended_keyboard
 description: Flutter plugin for create custom keyboards quickly.
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/fluttercandies/extended_keyboard
 issue_tracker: https://github.com/fluttercandies/extended_keyboard/issues
 topics:

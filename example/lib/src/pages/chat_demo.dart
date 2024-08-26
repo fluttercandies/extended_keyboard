@@ -47,7 +47,9 @@ class _ChatDemoState extends State<ChatDemo> {
   final ScrollController _controller = ScrollController();
 
   final List<Message> _messages = <Message>[];
-
+  bool _readOnly = false;
+  late CustomKeyboardController customKeyboardController =
+      CustomKeyboardController(KeyboardType.system);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,12 +59,23 @@ class _ChatDemoState extends State<ChatDemo> {
         bottom: true,
         child: KeyboardBuilder(
           resizeToAvoidBottomInset: true,
+          controller: customKeyboardController,
           builder: (BuildContext context, double? systemKeyboardHeight) {
             return _buildCustomKeyboard(context, systemKeyboardHeight);
           },
           body: Column(children: <Widget>[
             Expanded(
-              child: KeyboardDismisser(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  if (_readOnly) {
+                    customKeyboardController.hideKeyboard();
+                    setState(() {
+                      _readOnly = false;
+                    });
+                  }
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 child: ListView.builder(
                   controller: _controller,
                   itemBuilder: (BuildContext context, int index) {
@@ -117,6 +130,8 @@ class _ChatDemoState extends State<ChatDemo> {
                   Expanded(
                     child: ExtendedTextField(
                       key: _key,
+                      readOnly: _readOnly,
+                      showCursor: true,
                       specialTextSpanBuilder: _mySpecialTextSpanBuilder,
                       controller: _textEditingController,
                       textInputAction: TextInputAction.done,
@@ -138,6 +153,13 @@ class _ChatDemoState extends State<ChatDemo> {
                         ),
                       ),
                       maxLines: 2,
+                      onTap: () {
+                        if (_readOnly) {
+                          setState(() {
+                            _readOnly = false;
+                          });
+                        }
+                      },
                     ),
                   ),
                   KeyboardTypeBuilder(
@@ -147,37 +169,15 @@ class _ChatDemoState extends State<ChatDemo> {
                     ) =>
                         Row(
                       children: <Widget>[
-                        ToggleButton(
-                          builder: (bool active) => Icon(
-                            Icons.sentiment_very_satisfied,
-                            color: active ? Colors.orange : null,
-                          ),
-                          activeChanged: (bool active) {
-                            _keyboardPanelType = KeyboardPanelType.emoji;
-                            if (active) {
-                              controller.showKeyboard();
-                            } else {
-                              controller.hideKeyboard();
-                            }
-                          },
-                          active: controller.isCustom &&
-                              _keyboardPanelType == KeyboardPanelType.emoji,
+                        createButton(
+                          Icons.sentiment_very_satisfied,
+                          KeyboardPanelType.emoji,
+                          controller,
                         ),
-                        ToggleButton(
-                          builder: (bool active) => Icon(
-                            Icons.image,
-                            color: active ? Colors.orange : null,
-                          ),
-                          activeChanged: (bool active) {
-                            _keyboardPanelType = KeyboardPanelType.image;
-                            if (active) {
-                              controller.showKeyboard();
-                            } else {
-                              controller.hideKeyboard();
-                            }
-                          },
-                          active: controller.isCustom &&
-                              _keyboardPanelType == KeyboardPanelType.image,
+                        createButton(
+                          Icons.image,
+                          KeyboardPanelType.image,
+                          controller,
                         ),
                       ],
                     ),
@@ -188,6 +188,34 @@ class _ChatDemoState extends State<ChatDemo> {
           ]),
         ),
       ),
+    );
+  }
+
+  Widget createButton(
+    IconData icon,
+    KeyboardPanelType keyboardPanelType,
+    CustomKeyboardController controller,
+  ) {
+    return ToggleButton(
+      builder: (bool active) => Icon(
+        icon,
+        color: active ? Colors.orange : null,
+      ),
+      activeChanged: (bool active) {
+        _keyboardPanelType = keyboardPanelType;
+        if (active) {
+          controller.showKeyboard();
+        } else {
+          controller.hideKeyboard();
+        }
+
+        if (!_readOnly) {
+          setState(() {
+            _readOnly = true;
+          });
+        }
+      },
+      active: controller.isCustom && _keyboardPanelType == keyboardPanelType,
     );
   }
 

@@ -72,16 +72,11 @@ TextField(
        ),
        activeChanged: (bool active) {
          _keyboardPanelType = KeyboardPanelType.emoji;
-         if (active) {
-           controller.showKeyboard();
-         } else {
-           controller.hideKeyboard();
-         }
-         if (!_readOnly) {
-            setState(() {
-              _readOnly = true;
-            });
-         }
+          if (active) {
+            controller.showCustomKeyboard();
+          } else {
+            controller.hideCustomKeyboard();
+          }
        },
        active: controller.isCustom &&
            _keyboardPanelType == KeyboardPanelType.emoji,
@@ -93,10 +88,12 @@ TextField(
 
 用于通知 `KeyboardType` 改变，并且控制自定义键盘的开关。
 
-* `KeyboardType` : The current keyboard type
-* `isCustom` :  whether current keyboard is custom
-* `showKeyboard` : show the custom keyboard
-* `hideKeyboard` : hide the custom keyboard
+* `KeyboardType` : 当前键盘的类型
+* `isCustom` :  是否是自定义键盘
+* `showCustomKeyboard` : 打开自定义键盘
+* `hideCustomKeyboard` : 关闭自定义键盘
+* `showSystemKeyboard` : 打开系统键盘 (通过将 readOnly 设置成 false)
+* `unfocus` : 使输入框失去焦点, 并且关闭系统和自定义键盘
 
 #### KeyboardBuilder
 
@@ -107,7 +104,7 @@ TextField(
 | parameter                | description                                        | default  |
 | ------------------------ | -------------------------------------------------- | -------- |
 | builder                  | 一个构建器函数，它根据系统键盘高度返回一个小部件。 | required |
-| body                     | 包含输入框的组件部分                               | required |
+| bodyBuilder              | 一个带 `readOnly` 参数的组件回调                   | required |
 | resizeToAvoidBottomInset | 跟 `Scaffold.resizeToAvoidBottomInset` 作用一致    | true     |
 | controller               | 自定义键盘控制器                                   | null     |
 
@@ -123,19 +120,15 @@ TextField(
         builder: (BuildContext context, double? systemKeyboardHeight) {
           return Container();
         },
-        body: Column(children: <Widget>[
+        bodyBuilder: (bool readOnly) => Column(children: <Widget>[
           Row(
             children: <Widget>[
               Expanded(
                 child: TextField(
-                  readOnly: _readOnly, 
+                  readOnly: readOnly, 
                   showCursor: true,
                   onTap: () {
-                    if (_readOnly) {
-                      setState(() {
-                        _readOnly = false;
-                      });
-                    }
+                    _customKeyboardController.showSystemKeyboard();
                   },
                 ),
               ),
@@ -152,14 +145,9 @@ TextField(
                   activeChanged: (bool active) {
                     _keyboardPanelType = KeyboardPanelType.emoji;
                     if (active) {
-                      controller.showKeyboard();
+                      controller.showCustomKeyboard();
                     } else {
-                      controller.hideKeyboard();
-                    }
-                    if (!_readOnly) {
-                      setState(() {
-                        _readOnly = true;
-                      });
+                      controller.hideCustomKeyboard();
                     }
                   },
                   active: controller.isCustom &&

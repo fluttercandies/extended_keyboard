@@ -26,7 +26,7 @@ typedef KeyboardBuilderCallback = Widget Function(
 class KeyboardBuilder extends StatefulWidget {
   const KeyboardBuilder({
     Key? key,
-    required this.body,
+    required this.bodyBuilder,
     required this.builder,
     this.resizeToAvoidBottomInset = true,
     this.controller,
@@ -36,7 +36,7 @@ class KeyboardBuilder extends StatefulWidget {
   final KeyboardBuilderCallback builder;
 
   /// The main body widget.
-  final Widget body;
+  final Widget Function(bool readOnly) bodyBuilder;
 
   /// If true the [body] and the [KeyboardBuilder]'s floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
@@ -138,7 +138,12 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
       return Column(
         children: <Widget>[
           Expanded(
-            child: widget.body,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _controller._readOnly,
+              builder: (BuildContext context, bool readOnly, Widget? child) {
+                return widget.bodyBuilder(readOnly);
+              },
+            ),
           ),
           ValueListenableBuilder<KeyboardType>(
             valueListenable: _controller,
@@ -201,7 +206,12 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
       return Stack(
         children: <Widget>[
           Positioned.fill(
-            child: widget.body,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _controller._readOnly,
+              builder: (BuildContext context, bool readOnly, Widget? child) {
+                return widget.bodyBuilder(readOnly);
+              },
+            ),
           ),
           Positioned.fill(
             child: ValueListenableBuilder<KeyboardType>(
@@ -250,7 +260,10 @@ class _KeyboardBuilderState extends State<KeyboardBuilder>
 class CustomKeyboardController extends ChangeNotifier
     implements ValueListenable<KeyboardType> {
   /// Creates a [ChangeNotifier] that wraps this value.
-  CustomKeyboardController(this._value);
+  CustomKeyboardController(
+    this._value, {
+    bool readOnly = false,
+  }) : _readOnly = ValueNotifier<bool>(readOnly);
 
   /// The current keyboard type.
 
@@ -282,17 +295,36 @@ class CustomKeyboardController extends ChangeNotifier
   bool get isCustom => _value == KeyboardType.custom;
 
   /// hide the custom keyboard
-  void hideKeyboard() {
+  void hideCustomKeyboard() {
     _setValue(KeyboardType.system);
+    _readOnly.value = false;
   }
 
   /// show the custom keyboard
-  void showKeyboard() {
-    // final KeyboardType old = _value;
+  void showCustomKeyboard() {
     _updateValue(KeyboardType.custom);
-    // if (old == KeyboardType.system) {
-    // SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
-    // }
+    _readOnly.value = true;
+  }
+
+  /// if we want to close the keyboard without losing textfield focus,
+  /// we can't use `SystemChannels.textInput.invokeMethod<void>('TextInput.hide')` any more.
+  /// related issue https://github.com/flutter/flutter/issues/16863
+  ///
+  /// TextField(
+  /// showCursor: true,
+  /// readOnly: true,
+  /// )
+  final ValueNotifier<bool> _readOnly;
+
+  /// show the system keyboard (set readOnly to false， it works if the input is on hasFocus)
+  void showSystemKeyboard() {
+    _readOnly.value = false;
+  }
+
+  /// make the input lost focus and hide the system keyboard or custom keyboard
+  void unfocus() {
+    hideCustomKeyboard();
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   @override

@@ -47,8 +47,8 @@ class _ChatDemoState extends State<ChatDemo> {
   final ScrollController _controller = ScrollController();
 
   final List<Message> _messages = <Message>[];
-  bool _readOnly = false;
-  late CustomKeyboardController customKeyboardController =
+
+  final CustomKeyboardController _customKeyboardController =
       CustomKeyboardController(KeyboardType.system);
   @override
   Widget build(BuildContext context) {
@@ -59,133 +59,125 @@ class _ChatDemoState extends State<ChatDemo> {
         bottom: true,
         child: KeyboardBuilder(
           resizeToAvoidBottomInset: true,
-          controller: customKeyboardController,
+          controller: _customKeyboardController,
           builder: (BuildContext context, double? systemKeyboardHeight) {
             return _buildCustomKeyboard(context, systemKeyboardHeight);
           },
-          body: Column(children: <Widget>[
-            Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  if (_readOnly) {
-                    customKeyboardController.hideKeyboard();
-                    setState(() {
-                      _readOnly = false;
-                    });
-                  }
-                  FocusManager.instance.primaryFocus?.unfocus();
-                },
-                child: ListView.builder(
-                  controller: _controller,
-                  itemBuilder: (BuildContext context, int index) {
-                    final Message message = _messages[index];
-                    List<Widget> children = <Widget>[
-                      ExtendedImage.asset(
-                        Assets.assets_avatar_jpg,
-                        width: 20,
-                        height: 20,
-                      ),
-                      const SizedBox(width: 5),
-                      Flexible(
-                        child: ExtendedText(
-                          message.content,
-                          specialTextSpanBuilder: _mySpecialTextSpanBuilder,
-                          maxLines: 10,
-                        ),
-                      ),
-                    ];
-                    if (message.isMe) {
-                      children = children.reversed.toList();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: message.isMe
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.start,
-                        children: children,
-                      ),
-                    );
+          bodyBuilder: (bool readOnly) => Column(
+            children: <Widget>[
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    _customKeyboardController.unfocus();
                   },
-                  itemCount: _messages.length,
+                  child: ListView.builder(
+                    controller: _controller,
+                    itemBuilder: (BuildContext context, int index) {
+                      final Message message = _messages[index];
+                      List<Widget> children = <Widget>[
+                        ExtendedImage.asset(
+                          Assets.assets_avatar_jpg,
+                          width: 20,
+                          height: 20,
+                        ),
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: ExtendedText(
+                            message.content,
+                            specialTextSpanBuilder: _mySpecialTextSpanBuilder,
+                            maxLines: 10,
+                          ),
+                        ),
+                      ];
+                      if (message.isMe) {
+                        children = children.reversed.toList();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: message.isMe
+                              ? MainAxisAlignment.end
+                              : MainAxisAlignment.start,
+                          children: children,
+                        ),
+                      );
+                    },
+                    itemCount: _messages.length,
+                  ),
                 ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: const BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.grey,
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey,
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: Colors.grey,
+                    ),
+                    bottom: BorderSide(
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: ExtendedTextField(
-                      key: _key,
-                      readOnly: _readOnly,
-                      showCursor: true,
-                      specialTextSpanBuilder: _mySpecialTextSpanBuilder,
-                      controller: _textEditingController,
-                      textInputAction: TextInputAction.done,
-                      strutStyle: const StrutStyle(),
-                      decoration: InputDecoration(
-                        hintText: 'Input something',
-                        border: InputBorder.none,
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              sendMessage(_textEditingController.text);
-                              _textEditingController.clear();
-                            });
-                          },
-                          child: const Icon(Icons.send),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: ExtendedTextField(
+                        key: _key,
+                        readOnly: readOnly,
+                        showCursor: true,
+                        specialTextSpanBuilder: _mySpecialTextSpanBuilder,
+                        controller: _textEditingController,
+                        textInputAction: TextInputAction.done,
+                        strutStyle: const StrutStyle(),
+                        decoration: InputDecoration(
+                          hintText: 'Input something',
+                          border: InputBorder.none,
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                sendMessage(_textEditingController.text);
+                                _textEditingController.clear();
+                              });
+                            },
+                            child: const Icon(Icons.send),
+                          ),
+                          contentPadding: const EdgeInsets.all(
+                            12.0,
+                          ),
                         ),
-                        contentPadding: const EdgeInsets.all(
-                          12.0,
-                        ),
+                        maxLines: 2,
+                        onTap: () {
+                          _customKeyboardController.showSystemKeyboard();
+                        },
                       ),
-                      maxLines: 2,
-                      onTap: () {
-                        if (_readOnly) {
-                          setState(() {
-                            _readOnly = false;
-                          });
-                        }
-                      },
                     ),
-                  ),
-                  KeyboardTypeBuilder(
-                    builder: (
-                      BuildContext context,
-                      CustomKeyboardController controller,
-                    ) =>
-                        Row(
-                      children: <Widget>[
-                        createButton(
-                          Icons.sentiment_very_satisfied,
-                          KeyboardPanelType.emoji,
-                          controller,
-                        ),
-                        createButton(
-                          Icons.image,
-                          KeyboardPanelType.image,
-                          controller,
-                        ),
-                      ],
+                    KeyboardTypeBuilder(
+                      builder: (
+                        BuildContext context,
+                        CustomKeyboardController controller,
+                      ) =>
+                          Row(
+                        children: <Widget>[
+                          createButton(
+                            Icons.sentiment_very_satisfied,
+                            KeyboardPanelType.emoji,
+                            controller,
+                          ),
+                          createButton(
+                            Icons.image,
+                            KeyboardPanelType.image,
+                            controller,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ]),
+            ],
+          ),
         ),
       ),
     );
@@ -204,15 +196,9 @@ class _ChatDemoState extends State<ChatDemo> {
       activeChanged: (bool active) {
         _keyboardPanelType = keyboardPanelType;
         if (active) {
-          controller.showKeyboard();
+          controller.showCustomKeyboard();
         } else {
-          controller.hideKeyboard();
-        }
-
-        if (!_readOnly) {
-          setState(() {
-            _readOnly = true;
-          });
+          controller.hideCustomKeyboard();
         }
       },
       active: controller.isCustom && _keyboardPanelType == keyboardPanelType,

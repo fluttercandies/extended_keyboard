@@ -72,16 +72,11 @@ A widget that listens to changes in the `CustomKeyboardController` and builds a 
        ),
        activeChanged: (bool active) {
          _keyboardPanelType = KeyboardPanelType.emoji;
-         if (active) {
-           controller.showKeyboard();
-         } else {
-           controller.hideKeyboard();
-         }
-         if (!_readOnly) {
-           setState(() {
-             _readOnly = true;
-           });
-         }
+        if (active) {
+          controller.showCustomKeyboard();
+        } else {
+          controller.hideCustomKeyboard();
+        }
        },
        active: controller.isCustom &&
            _keyboardPanelType == KeyboardPanelType.emoji,
@@ -95,8 +90,10 @@ A controller for managing the keyboard type and notifying listeners.
 
 * `KeyboardType` : The current keyboard type
 * `isCustom` :  whether current keyboard is custom
-* `showKeyboard` : show the custom keyboard
-* `hideKeyboard` : hide the custom keyboard
+* `showCustomKeyboard` : show the custom keyboard
+* `hideCustomKeyboard` : hide the custom keyboard
+* `showSystemKeyboard` : show the system keyboard (set readOnly to false， it works if the input is on hasFocus)
+* `unfocus` : make the input lost focus and hide the system keyboard or custom keyboard
 
 #### KeyboardBuilder
 
@@ -107,7 +104,7 @@ Using the `KeyboardBuilder` widget to encapsulate the area containing the input 
 | parameter                | description                                                                   | default  |
 | ------------------------ | ----------------------------------------------------------------------------- | -------- |
 | builder                  | A builder function that returns a widget based on the system keyboard height. | required |
-| body                     | The main body widget.                                                         | required |
+| bodyBuilder              | The main body widget builder with a parameter `readOnly`                      | required |
 | resizeToAvoidBottomInset | The same as `Scaffold.resizeToAvoidBottomInset`.                              | true     |
 | controller               | The controller for the custom keyboard.                                       | null     |
 
@@ -123,19 +120,15 @@ Using the `KeyboardBuilder` widget to encapsulate the area containing the input 
         builder: (BuildContext context, double? systemKeyboardHeight) {
           return Container();
         },
-        body: Column(children: <Widget>[
+        bodyBuilder: (bool readOnly) => Column(children: <Widget>[
           Row(
             children: <Widget>[
               Expanded(
                 child: TextField(
-                  readOnly: _readOnly, 
+                  readOnly: readOnly, 
                   showCursor: true,
                   onTap: () {
-                    if (_readOnly) {
-                      setState(() {
-                        _readOnly = false;
-                      });
-                    }
+                    _customKeyboardController.showSystemKeyboard();
                   },
                 ),
               ),
@@ -152,14 +145,9 @@ Using the `KeyboardBuilder` widget to encapsulate the area containing the input 
                   activeChanged: (bool active) {
                     _keyboardPanelType = KeyboardPanelType.emoji;
                     if (active) {
-                      controller.showKeyboard();
+                      controller.showCustomKeyboard();
                     } else {
-                      controller.hideKeyboard();
-                    }
-                    if (!_readOnly) {
-                      setState(() {
-                        _readOnly = true;
-                      });
+                      controller.hideCustomKeyboard();
                     }
                   },
                   active: controller.isCustom &&

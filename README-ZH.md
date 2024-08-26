@@ -270,8 +270,4 @@ Future<void> main() async {
 
 [Full Demo](https://github.com/fluttercandies/extended_keyboard/blob/main/example/lib/src/pages/text_input_demo.dart)
 
-![img](https://github.com/fluttercandies/flutter_candies/blob/master/gif/extended_keyboard/chat_demo1.gif)
-
-[Full Demo](https://github.com/fluttercandies/extended_keyboard/blob/main/example/lib/src/pages/chat_demo1.dart)
-
  

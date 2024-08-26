@@ -28,7 +28,7 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
       <ModalRoute<Object?>, List<KeyboardConfiguration>>{};
 
   /// Notifier that updates when a custom keyboard needs to be shown.
-  ValueNotifier<KeyboardConfiguration?> showKeyboardNotifier =
+  ValueNotifier<KeyboardConfiguration?> keyboardConfigurationNotifier =
       ValueNotifier<KeyboardConfiguration?>(null);
 
   /// Registers a route with its corresponding keyboard configurations.
@@ -83,25 +83,25 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
       switch (methodCall.method) {
         case 'TextInput.show':
           if (keyboardConfiguration != null) {
-            showKeyboardNotifier.value = keyboardConfiguration;
+            keyboardConfigurationNotifier.value = keyboardConfiguration;
             return codec.encodeSuccessEnvelope(null);
           }
           break;
         case 'TextInput.hide':
-          showKeyboardNotifier.value = keyboardConfiguration;
+          keyboardConfigurationNotifier.value = keyboardConfiguration;
           break;
         case 'TextInput.clearClient':
           _connectionId = null;
           _name = null;
           if (keyboardConfiguration != null) {
-            showKeyboardNotifier.value = keyboardConfiguration;
+            keyboardConfigurationNotifier.value = keyboardConfiguration;
             _keyboardConfiguration = null;
             return codec.encodeSuccessEnvelope(null);
           }
           break;
         case 'TextInput.setClient':
-          _connectionId = methodCall.arguments[0] as int;
-          _name = methodCall.arguments[1]['inputType']['name'] as String;
+          _connectionId = methodCall.arguments[0] as int?;
+          _name = methodCall.arguments[1]['inputType']['name'] as String?;
 
           for (final ModalRoute<Object?> route in _configurations.keys) {
             if (route.isCurrent) {
@@ -117,6 +117,23 @@ mixin KeyboardBindingMixin on WidgetsFlutterBinding {
             }
           }
           break;
+        case 'TextInput.updateConfig':
+          _name = methodCall.arguments['inputType']['name'] as String?;
+          for (final ModalRoute<Object?> route in _configurations.keys) {
+            if (route.isCurrent) {
+              final List<KeyboardConfiguration> configs =
+                  _configurations[route]!;
+              for (final KeyboardConfiguration config in configs) {
+                if (_name == config.keyboardType.name) {
+                  _keyboardConfiguration = config;
+                  _hideSystemKeyBoardIfNeed();
+                  return codec.encodeSuccessEnvelope(null);
+                }
+              }
+            }
+          }
+          break;
+
         default:
       }
     }

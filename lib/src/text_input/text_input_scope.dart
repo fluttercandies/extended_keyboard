@@ -107,7 +107,8 @@ class _TextInputScopeState extends State<TextInputScope> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<KeyboardConfiguration?>(
-      valueListenable: KeyboardBindingMixin.binding.showKeyboardNotifier,
+      valueListenable:
+          KeyboardBindingMixin.binding.keyboardConfigurationNotifier,
       builder: (
         BuildContext context,
         KeyboardConfiguration? configuration,

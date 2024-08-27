@@ -18,6 +18,7 @@ Language: [English](README.md) | 中文简体
       - [KeyboardBinding / KeyboardBindingMixin](#keyboardbinding--keyboardbindingmixin)
       - [KeyboardConfiguration](#keyboardconfiguration)
       - [TextInputScope](#textinputscope-1)
+    - [extension](#extension)
 
 
 ## 安装
@@ -282,4 +283,11 @@ Future<void> main() async {
 
 [Full Demo](https://github.com/fluttercandies/extended_keyboard/blob/main/example/lib/src/pages/text_input_demo.dart)
 
- 
+ ### extension
+
+TextEditingController 的扩展方法
+
+*  `void insertText(String text)` 在当前位置插入文本
+*  `void delete()` 删除一个字符
+*  `TextEditingValue deleteText()`  删除一个字符并且返回删除之后的值，可以根据自己的情况再处理
+*  `void performAction(TextInputAction action)` 跟 `TextInputClient.performAction` 一样的作用

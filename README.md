@@ -18,6 +18,7 @@ Flutter plugin for create custom keyboards quickly.
       - [KeyboardBinding / KeyboardBindingMixin](#keyboardbinding--keyboardbindingmixin)
       - [KeyboardConfiguration](#keyboardconfiguration)
       - [TextInputScope](#textinputscope-1)
+    - [extension](#extension)
 
 
 ## Install
@@ -284,5 +285,12 @@ if `Scaffold` is used, make sure set `Scaffold.resizeToAvoidBottomInset` to fals
 [Full Demo](https://github.com/fluttercandies/extended_keyboard/blob/main/example/lib/src/pages/text_input_demo.dart)
 
 
+### extension
 
- 
+The extension for TextEditingController
+
+*  `void insertText(String text)` Insert text at the current selection or replace the current selection with
+*  `void delete()` Delete the character before the current selection or delete the current selection
+*  `TextEditingValue deleteText()`  Delete the character before the current selection or delete the current selection
+   and handle the TextEditingValue base on your case
+*  `void performAction(TextInputAction action)` The same as `TextInputClient.performAction`

@@ -25,7 +25,7 @@ class SystemKeyboard with WidgetsBindingObserver {
       <SystemKeyboardHeight>[];
 
   /// A `ValueNotifier` that notifies listeners after the system keyboard layout has finished.
-  ValueNotifier<double> afterSystemKeyboardLayoutFinshed =
+  ValueNotifier<double> afterSystemKeyboardLayoutFinished =
       ValueNotifier<double>(0);
 
   /// Stores the last known keyboard height.
@@ -44,7 +44,7 @@ class SystemKeyboard with WidgetsBindingObserver {
     if (currentHeight != 0) {
       _systemKeyboard.updateHeight(currentHeight);
     }
-    _systemKeyboard.afterSystemKeyboardLayoutFinshed.value = currentHeight;
+    _systemKeyboard.afterSystemKeyboardLayoutFinished.value = currentHeight;
   }.debounce(const Duration(milliseconds: 100));
 
   /// Gets the last known app-wide keyboard height.

@@ -52,11 +52,11 @@ class _TextInputScopeState extends State<TextInputScope> {
   void initState() {
     super.initState();
     SystemKeyboard()
-        .afterSystemKeyboardLayoutFinshed
-        .addListener(_afterKeyboardLayoutFinshed);
+        .afterSystemKeyboardLayoutFinished
+        .addListener(_afterKeyboardLayoutFinished);
   }
 
-  void _afterKeyboardLayoutFinshed() {
+  void _afterKeyboardLayoutFinished() {
     if (_currentKeyboardHeight == 0) {
       return;
     }
@@ -90,8 +90,8 @@ class _TextInputScopeState extends State<TextInputScope> {
   @override
   void dispose() {
     SystemKeyboard()
-        .afterSystemKeyboardLayoutFinshed
-        .removeListener(_afterKeyboardLayoutFinshed);
+        .afterSystemKeyboardLayoutFinished
+        .removeListener(_afterKeyboardLayoutFinished);
     SystemKeyboard().clearCurrentRouteLastKeyboardHeight(_route!);
     KeyboardBindingMixin.binding.unregister(route: _route!);
     super.dispose();
